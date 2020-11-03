@@ -1,7 +1,10 @@
-import json
-
 from whois_info import get_whois_text, get_whois_info
-from redis_handler import check_whois_text, rec_whois_text, check_http_info, rec_http_info
+from redis_handler import (
+    check_whois_text,
+    rec_whois_text,
+    check_http_info,
+    rec_http_info,
+)
 from http_info import get_http_info
 
 

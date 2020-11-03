@@ -13,7 +13,7 @@ def get_whois_text(dname: str) -> str:
         str: информация whois о домене.
     """
     response = bytes()
-    dname = dname.encode('idna').decode('utf-8')
+    dname = dname.encode("idna").decode("utf-8")
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
         sock.settimeout(TIMEOUT)
         sock.connect((WHOIS_SERVER, PORT))
@@ -34,17 +34,17 @@ def get_whois_text(dname: str) -> str:
 
 def get_whois_info(whois_text):
     if "created" in whois_text:
-        whois_text = whois_text.split('\n')
+        whois_text = whois_text.split("\n")
         whois_info = {}
         number_server = 0
         whois_text = whois_text[5:-5]
         for whois in whois_text:
-            whois = whois.split(':', maxsplit=1)
-            if whois[0] != 'nserver':
+            whois = whois.split(":", maxsplit=1)
+            if whois[0] != "nserver":
                 whois_info[whois[0]] = whois[1].strip()
             else:
                 number_server = number_server + 1
-                whois_info[f'nserver {number_server}'] = whois[1].strip()
+                whois_info[f"nserver {number_server}"] = whois[1].strip()
     else:
-        whois_info = 'Домен не зарегистрирован'
+        whois_info = "Домен не зарегистрирован"
     return whois_info

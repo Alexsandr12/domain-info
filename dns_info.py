@@ -25,6 +25,6 @@ print(response.authority)
 
 import dns.resolver
 
-answers = dns.resolver.query('dnspython.org')
+answers = dns.resolver.query("dnspython.org")
 for rdata in answers.response.answer:
     print(rdata)

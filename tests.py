@@ -4,10 +4,10 @@ import redis
 test_conn = redis.Redis()
 
 dname = "reg.ru"
-key = 'fff'
-val = 'aaa'
-key2 = 'ggg'
-val2 = 'iii'
+key = "fff"
+val = "aaa"
+key2 = "ggg"
+val2 = "iii"
 
 """test_conn.hset(dname, key, val)
 test_conn.hset(dname, key2, val2)
