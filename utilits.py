@@ -11,3 +11,6 @@ def decode_domain(dname):
     return dname
 
 
+class MyException(Exception):
+    GETTING_DNS_INFO_ERROR = 'GETTING_DNS_INFO_ERROR'
+    qw = 'mda'

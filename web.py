@@ -2,14 +2,17 @@ import json
 
 from flask import Flask, request
 
-from controller import whois_text, whois_info, http_info
+from controller import whois_text, whois_info, http_info, dns_info
 from config import INDENT
 
 app = Flask(__name__)
 
 
 # TODO правильная запись в редис?
-
+# TODO проверить все вложенности, возможно ли извабиться
+# TODO придумать нормальные названия для всех функцией
+# TODO сделать все сервисные ошибки для вывода клиенту
+# TODO модуль POST-метод get_all_info
 
 @app.route("/get_whois_text", methods=["POST", "GET"])
 def get_whois_text():
@@ -30,6 +33,13 @@ def get_http_info():
     dnames = request.json["domain"]
     http_info_dnames = http_info(dnames)
     return json.dumps(http_info_dnames, indent=INDENT, ensure_ascii=False)
+
+
+@app.route("/get_dns_info", methods=["POST", "GET"])
+def get_dns_info():
+    dnames = request.json["domain"]
+    dns_info_domains = dns_info(dnames)
+    return json.dumps(dns_info_domains, indent=INDENT, ensure_ascii=False)
 
 
 if __name__ == "__main__":
