@@ -26,15 +26,17 @@ from utilits import MyException
 
 def get_dns_records(dname: str):
     records_of_dname = {}
-    type_of_records = ['A', 'AAAA', 'NS', 'TXT', 'MX', 'CNAME']
+    type_of_records = ["A", "AAAA", "NS", "TXT", "MX", "CNAME"]
     for type_record in type_of_records:
-        query = dns.message.make_query(dname, dns.rdatatype.from_text(type_record), payload=4096)
+        query = dns.message.make_query(
+            dname, dns.rdatatype.from_text(type_record), payload=4096
+        )
         response = dns.query.udp(query, "194.85.61.20", timeout=3)
         values_record = get_records_from_response(response)
         records_of_dname[type_record] = values_record
-    print(type(records_of_dname['NS']))
-    if records_of_dname['NS'] is None:
-        print(records_of_dname['NS'])
+    print(type(records_of_dname["NS"]))
+    if records_of_dname["NS"] is None:
+        print(records_of_dname["NS"])
         raise MyException
     return records_of_dname
 
@@ -50,7 +52,7 @@ def get_records_from_response(response):
     return values_record
 
 
-print(get_dns_records('мама.рф'))
+print(get_dns_records("мама.рф"))
 
 """def a(s):
     bab = s+2

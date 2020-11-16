@@ -1,6 +1,7 @@
 import socket
 
 from config import TIMEOUT, PORT, WHOIS_SERVER
+from utilits import MyException
 
 
 def get_whois_text(dname: str) -> str:
@@ -33,7 +34,7 @@ def get_whois_text(dname: str) -> str:
 
 def get_whois_info(whois_text):
     if "created" not in whois_text:
-        return 'Домен не зарегистрирован'
+        raise MyException
     whois_text = whois_text.split("\n")
     whois_info = {}
     number_server = 0

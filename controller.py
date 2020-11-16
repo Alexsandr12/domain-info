@@ -9,7 +9,7 @@ from redis_handler import (
     check_http_info,
     rec_http_info,
 )
-from utilits import encoding_domain, decode_domain,  MyException
+from utilits import encoding_domain, decode_domain, MyException
 
 
 def whois_dname(dname):
@@ -36,7 +36,10 @@ def whois_info(dnames):
     whois_info_dnames = {}
     for dname in dnames:
         whois_text = whois_dname(dname)
-        whois_info = get_whois_info(whois_text)
+        try:
+            whois_info = get_whois_info(whois_text)
+        except MyException as err:
+            whois_info = err.DOMAIN_NOT_REGISTRED
         dname = decode_domain(dname)
         whois_info_dnames[dname] = whois_info
     return whois_info_dnames
@@ -62,7 +65,7 @@ def forming_response_http(dname):
         http_info = get_http_info(dname)
         return f"code: {http_info[0]}, https: {http_info[1]}"
     except requests.exceptions.RequestException:
-        return "ошибка получения данных"
+        return MyException.GETTING_HTTP_INFO_ERROR
 
 
 def dns_info(dnames):
@@ -81,3 +84,19 @@ def get_records_of_dname(dname):
     except MyException as err:
         return err.GETTING_DNS_INFO_ERROR
     return records_of_dname
+
+
+def get_all_info_domains(dnames):
+    all_info = {}
+    whois_text_dnames = whois_text(dnames)
+    whois_info_dnames = whois_info(dnames)
+    http_info_dnames = http_info(dnames)
+    dns_info_dnames = dns_info(dnames)
+    for dname in dnames:
+        all_info[dname] = {
+            "whois_text": whois_text_dnames[dname],
+            "whois_info": whois_info_dnames[dname],
+            "http_info": http_info_dnames[dname],
+            "dns_info": dns_info_dnames[dname],
+        }
+    return all_info

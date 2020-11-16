@@ -33,8 +33,8 @@ for rdata in answers.response.answer:
 
 
 def get_dns_of_dname(dname):
-    query = dns.message.make_query(dname, dns.rdatatype.from_text('ns'), payload=4096)
-    response = dns.query.udp(query, '193.232.128.6', one_rr_per_rrset=True, timeout=10)
+    query = dns.message.make_query(dname, dns.rdatatype.from_text("ns"), payload=4096)
+    response = dns.query.udp(query, "193.232.128.6", one_rr_per_rrset=True, timeout=10)
     rrset_ns = response.authority[0]
     if "IN NS" not in str(rrset_ns):
         raise MyException
@@ -51,14 +51,16 @@ def get_ip_of_dns(dname):
 
 def get_dns_records(dname: str):
     records_of_dname = {}
-    type_of_records = ['A', 'AAAA', 'NS', 'TXT', 'MX', 'CNAME']
+    type_of_records = ["A", "AAAA", "NS", "TXT", "MX", "CNAME"]
     ip_nserver = get_ip_of_dns(dname)
     for type_record in type_of_records:
-        query = dns.message.make_query(dname, dns.rdatatype.from_text(type_record), payload=4096)
+        query = dns.message.make_query(
+            dname, dns.rdatatype.from_text(type_record), payload=4096
+        )
         response = dns.query.udp(query, ip_nserver, timeout=3)
         values_record = get_records_from_response(response)
         records_of_dname[type_record] = values_record
-    if records_of_dname['NS'] is None:
+    if records_of_dname["NS"] is None:
         raise MyException
     return records_of_dname
 
