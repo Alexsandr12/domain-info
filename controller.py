@@ -11,6 +11,8 @@ from redis_handler import (
 )
 from utilits import encoding_domain, decode_domain, MyException
 
+# TODO попробовать реализовать класс с записью sql, encode и т.д.
+
 
 def whois_dname(dname):
     dname = encoding_domain(dname)
