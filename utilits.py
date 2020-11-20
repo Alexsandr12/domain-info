@@ -1,9 +1,12 @@
 import idna
 
 
-def encoding_domain(dname):
-    dname = dname.encode("idna").decode("utf-8")
-    return dname
+def encoding_dnames(dnames):
+    encode_dnames = []
+    for dname in dnames:
+        dname = dname.encode("idna").decode("utf-8")
+        encode_dnames.append(dname)
+    return encode_dnames
 
 
 def decode_domain(dname):

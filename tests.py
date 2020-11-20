@@ -32,7 +32,9 @@ class MyClass:
         c = self.a + 1
         return c
 
+    def aba(self):
+        b = MyClass.bab(self)
+        return b
 
-b = MyClass(1)
 
-print(b.bab())
+print(MyClass(1).aba())
