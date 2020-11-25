@@ -10,8 +10,10 @@ from redis_handler import (
     rec_http_info,
 )
 from utilits import encoding_dnames, decode_domain, MyException
+from sql_handler import add_data_in_mariadb
 
-# TODO попробовать реализовать класс с записью sql, encode и т.д.
+# TODO dns_info запись в редис как строку
+# TODO 2 класса, один(self, domains, methods) формирует ответ, записывает в sql и get методы, второй(dname) получает данные из других модулей
 
 
 class Controller:
@@ -41,8 +43,10 @@ class Controller:
             whois_text = Controller.whois_dname(self, dname)
             try:
                 whois_info = get_whois_info(whois_text)
+                add_data_in_mariadb(dname, "get_whois_info", True)
             except MyException as err:
                 whois_info = err.DOMAIN_NOT_REGISTRED
+                add_data_in_mariadb(dname, "get_whois_info", False)
             dname = decode_domain(dname)
             whois_info_dnames[dname] = whois_info
         return whois_info_dnames
@@ -56,6 +60,7 @@ class Controller:
                 rec_http_info(dname, http_info)
             else:
                 http_info = http_info.decode("utf-8", "replace")
+            Controller.forming_http_method_mariadb(self, dname, http_info)
             dname = decode_domain(dname)
             http_info_dnames[dname] = http_info
         return http_info_dnames
@@ -66,6 +71,13 @@ class Controller:
             return f"code: {http_info[0]}, https: {http_info[1]}"
         except requests.exceptions.RequestException:
             return MyException.GETTING_HTTP_INFO_ERROR
+
+    def forming_http_method_mariadb(self, dname, http_info):
+        if MyException.GETTING_HTTP_INFO_ERROR in http_info:
+            add_data_in_mariadb(dname, "get_http_info", False)
+        else:
+            add_data_in_mariadb(dname, "get_http_info", True)
+
 
     def dns_info(self):
         dns_info_domains = {}
@@ -78,7 +90,9 @@ class Controller:
     def get_records_of_dname(self, dname):
         try:
             records_of_dname = get_dns_records(dname)
+            add_data_in_mariadb(dname, "get_dns_info", True)
         except MyException as err:
+            add_data_in_mariadb(dname, "get_dns_info", False)
             return err.GETTING_DNS_INFO_ERROR
         return records_of_dname
 
@@ -89,6 +103,7 @@ class Controller:
         http_info_dnames = Controller.http_info(self)
         dns_info_dnames = Controller.dns_info(self)
         for dname in self.dnames:
+            add_data_in_mariadb(dname, "get_all_info", True)
             dname = decode_domain(dname)
             all_info[dname] = {
                 "whois_text": whois_text_dnames[dname],
