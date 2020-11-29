@@ -24,17 +24,23 @@ import dns.resolver
 from utilits import MyException
 
 
-class MyClass:
+"""class MyClass:
     def __init__(self, a):
-        self.a = a + 1
+        self.a = a
+        self.a = self.bab()
 
     def bab(self):
         c = self.a + 1
         return c
 
     def aba(self):
-        b = MyClass.bab(self)
+        b = self.bab()
         return b
 
+zaz = MyClass(1)
 
-print(MyClass(1).aba())
+print(zaz.bab())"""
+
+a = {"a":[1,2,3], "b":[2,3,4]}
+
+print(a['a'])

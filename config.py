@@ -11,3 +11,6 @@ EXPIRED_RECORD = 3600
 
 """http_info.py"""
 REQTIMEOUT = 5
+
+"""validation.py"""
+LIMIT_DOMAINS = 5
