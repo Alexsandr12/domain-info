@@ -31,8 +31,8 @@ def get_whois_info():
 @app.route("/get_http_info", methods=["POST"])
 def get_http_info():
     domains = request.json["domain"]
-    http_info_dnames = Controller(domains).forming_response('get_http_info')
-    return json.dumps(http_info_dnames, indent=INDENT, ensure_ascii=False)
+    http_info_domains = Controller(domains).forming_response('get_http_info')
+    return json.dumps(http_info_domains, indent=INDENT, ensure_ascii=False)
 
 
 @app.route("/get_dns_info", methods=["POST"])

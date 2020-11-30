@@ -9,7 +9,7 @@ from redis_handler import (
     check_http_info,
     rec_http_info,
 )
-from utilits import encoding_dnames, decode_domain, MyException
+from utilits import encoding_domains, decode_domain, MyException
 from sql_handler import add_data_in_mariadb
 from validation import Validation
 
@@ -22,24 +22,25 @@ from validation import Validation
 
 class Controller:
     def __init__(self, domains):
-        self.domains_puny = encoding_dnames(domains)
+        self.domains_puny = encoding_domains(domains)
 
     def forming_response(self, method):
         try:
             domains = self.validation_domains()
         except MyException as err:
             return err.DOMAINS_LIMIT_EXCEEDED
-        if method == 'get_whois_text':
+        if method is 'get_whois_text':
             response = self.whois_text(domains["domains_valid"])
-        elif method == 'get_whois_info':
+        elif method is 'get_whois_info':
             response = self.whois_info(domains["domains_valid"])
-        elif method == "get_http_info":
+        elif method is "get_http_info":
             response = self.http_info(domains["domains_valid"])
-        elif method == 'get_dns_info':
+        elif method is 'get_dns_info':
             response = self.dns_info(domains["domains_valid"])
-        elif method == 'get_all_info':
+        elif method is 'get_all_info':
             response = self.get_all_info_domains(domains["domains_valid"])
-        response['Invalid domain names'] = domains['domains_not_valid']
+        if domains['domains_not_valid']:
+            response['Invalid domain names'] = domains['domains_not_valid']
         return response
 
     def validation_domains(self):
@@ -56,15 +57,15 @@ class Controller:
         return whois_text
 
     def whois_text(self, domains):
-        whois_text_dnames = {}
+        whois_text_domains = {}
         for dname in domains:
             whois_text = self.whois_dname(dname)
             dname = decode_domain(dname)
-            whois_text_dnames[dname] = whois_text
-        return whois_text_dnames
+            whois_text_domains[dname] = whois_text
+        return whois_text_domains
 
     def whois_info(self, domains):
-        whois_info_dnames = {}
+        whois_info_domains = {}
         for dname in domains:
             whois_text = self.whois_dname(dname)
             try:
@@ -74,11 +75,11 @@ class Controller:
                 whois_info = err.DOMAIN_NOT_REGISTRED
                 add_data_in_mariadb(dname, "get_whois_info", False)
             dname = decode_domain(dname)
-            whois_info_dnames[dname] = whois_info
-        return whois_info_dnames
+            whois_info_domains[dname] = whois_info
+        return whois_info_domains
 
     def http_info(self, domains):
-        http_info_dnames = {}
+        http_info_domains = {}
         for dname in domains:
             http_info = check_http_info(dname)
             if http_info is None:
@@ -88,8 +89,8 @@ class Controller:
                 http_info = http_info.decode("utf-8", "replace")
             Controller.forming_http_method_mariadb(self, dname, http_info)
             dname = decode_domain(dname)
-            http_info_dnames[dname] = http_info
-        return http_info_dnames
+            http_info_domains[dname] = http_info
+        return http_info_domains
 
     def forming_response_http(self, dname):
         try:
