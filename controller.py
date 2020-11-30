@@ -29,18 +29,18 @@ class Controller:
             domains = self.validation_domains()
         except MyException as err:
             return err.DOMAINS_LIMIT_EXCEEDED
-        if method is 'get_whois_text':
+        if method is "get_whois_text":
             response = self.whois_text(domains["domains_valid"])
-        elif method is 'get_whois_info':
+        elif method is "get_whois_info":
             response = self.whois_info(domains["domains_valid"])
         elif method is "get_http_info":
             response = self.http_info(domains["domains_valid"])
-        elif method is 'get_dns_info':
+        elif method is "get_dns_info":
             response = self.dns_info(domains["domains_valid"])
-        elif method is 'get_all_info':
+        elif method is "get_all_info":
             response = self.get_all_info_domains(domains["domains_valid"])
-        if domains['domains_not_valid']:
-            response['Invalid domain names'] = domains['domains_not_valid']
+        if domains["domains_not_valid"]:
+            response["Invalid domain names"] = domains["domains_not_valid"]
         return response
 
     def validation_domains(self):
