@@ -18,9 +18,10 @@ class Validation:
         domains = {"domains_valid": [], "domains_not_valid": []}
         for dname in self.domains:
             dname = dname.lower()
-            if re.search(r'^[a-z\d]{1,1}[a-z\d-]{,61}[a-z\d]{1,1}\.{1,1}(ru|(xn--p1ai))$', dname):
+            if re.search(
+                r"^[a-z\d]{1,1}[a-z\d-]{,61}[a-z\d]{1,1}\.{1,1}(ru|(xn--p1ai))$", dname
+            ):
                 domains["domains_valid"].append(dname)
             else:
                 domains["domains_not_valid"].append(dname)
         return domains
-

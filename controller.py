@@ -15,8 +15,10 @@ from validation import Validation
 
 
 # TODO dns_info запись в редис как строку
-# TODO 2 класса, один(self, domains, methods) формирует ответ, записывает в sql и get методы, второй(dname) получает данные из других модулей
+# TODO 2 класса, один работает с доменами, другой только методы
 # TODO  либо отдельный модуль для redis либо внутри текущих модулей
+# TODO  проверить каждый модуль, после изменения итерации возможно есть лишние элементы
+# TODO добавить условие актуальности редис
 
 
 class Controller:
@@ -62,7 +64,6 @@ class Controller:
         else:
             whois_text = whois_text.decode("utf-8", "replace")
         return whois_text
-
 
     def whois_info(self, dname):
         whois_text = self.whois_text(dname)

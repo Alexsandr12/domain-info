@@ -53,7 +53,3 @@ if re.search(r'^[a-z\d]{1,1}[a-z0-9-]{,61}[a-z0-9]{1,1}\.{1,1}(ru|(xn--p1ai))$',
     print('1')
 else:
     print('2')"""
-
-
-
-
