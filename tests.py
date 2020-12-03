@@ -41,6 +41,19 @@ zaz = MyClass(1)
 
 print(zaz.bab())"""
 
-a = []
+"""import re
 
-print(not a)
+a = '1reg.ru'
+b = 'xn--p1ai.xn--p1ai'
+c = 'dfsdfsdf'
+
+z = re.search(r'^[a-z0-9]{1,1}[a-z0-9-]{,61}[a-z0-9]{1,1}\.{1,1}(ru|(xn--p1ai){1,1})', a)
+
+if re.search(r'^[a-z\d]{1,1}[a-z0-9-]{,61}[a-z0-9]{1,1}\.{1,1}(ru|(xn--p1ai))$', a):
+    print('1')
+else:
+    print('2')"""
+
+
+
+

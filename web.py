@@ -8,10 +8,8 @@ from config import INDENT
 app = Flask(__name__)
 
 
-# TODO правильная запись в редис?
 # TODO проверить все вложенности, возможно ли избавиться
 # TODO придумать нормальные названия для всех функцией (find, search)
-# TODO сделать все сервисные ошибки для вывода клиенту
 
 
 @app.route("/get_whois_text", methods=["POST"])

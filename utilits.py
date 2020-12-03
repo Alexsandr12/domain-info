@@ -2,7 +2,7 @@ import idna
 from config import LIMIT_DOMAINS
 
 
-def encoding_dnames(domains):
+def encoding_domains(domains):
     encode_domains = []
     for dname in domains:
         dname = dname.encode("idna").decode("utf-8")
