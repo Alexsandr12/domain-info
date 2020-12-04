@@ -5,20 +5,33 @@ from config import EXPIRED_RECORD
 redis_conn = redis.Redis()
 
 
-# TODO 2 модуля, на запись и на check
+# TODO decode для dns_info, чтобы выводились списки, а не строки с записями
 
 
-def check_whois_text(dname):
-    return redis_conn.get(f"whois_text:{dname}")
+def check_cache_redis(dname, method):
+    cache = redis_conn.get(f"{method}:{dname}")
+    if cache:
+        return cache.decode("utf-8", "replace")
+    return cache
 
 
-def rec_whois_text(dname, whois_text):
-    redis_conn.setex(f"whois_text:{dname}", EXPIRED_RECORD, whois_text)
+def rec_redis(dname, method, info):
+    redis_conn.setex(f"{method}:{dname}", EXPIRED_RECORD, info)
 
 
-def check_http_info(dname):
-    return redis_conn.get(f"http_info:{dname}")
+def check_dns_info(dname, method):
+    dns_info = redis_conn.hgetall(f"{method}:{dname}")
+    if dns_info:
+        dns_info_decode = {}
+        for key, val in dns_info.items():
+            dns_info_decode[key.decode("utf-8", "replace")] = val.decode(
+                "utf-8", "replace"
+            )
+        return dns_info_decode
+    return dns_info
 
 
-def rec_http_info(dname, http_info):
-    redis_conn.setex(f"http_info:{dname}", EXPIRED_RECORD, http_info)
+def rec_dns_info(dname, method, dns_info):
+    for type_record, val_record in dns_info.items():
+        redis_conn.hset(f"{method}:{dname}", type_record, str(val_record))
+    redis_conn.expire(f"{method}:{dname}", EXPIRED_RECORD)

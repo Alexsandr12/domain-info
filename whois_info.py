@@ -1,6 +1,6 @@
 import socket
 
-from config import TIMEOUT, PORT, WHOIS_SERVER
+from config import WHOIS_TIMEOUT, PORT, WHOIS_SERVER
 from utilits import MyException
 
 
@@ -15,14 +15,14 @@ def get_whois_text(dname: str) -> str:
     """
     response = bytes()
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-        sock.settimeout(TIMEOUT)
+        sock.settimeout(WHOIS_TIMEOUT)
         sock.connect((WHOIS_SERVER, PORT))
         sock.send(f"{dname}\r\n".encode())
         while True:
             try:
                 data = sock.recv(4096)
             except socket.timeout:
-                raise Exception
+                raise MyException
 
             if data:
                 response += data

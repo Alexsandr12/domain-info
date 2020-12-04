@@ -53,3 +53,28 @@ if re.search(r'^[a-z\d]{1,1}[a-z0-9-]{,61}[a-z0-9]{1,1}\.{1,1}(ru|(xn--p1ai))$',
     print('1')
 else:
     print('2')"""
+
+
+import redis
+
+a = {"a": [1, 2, 3], "b": [2, 3, 4]}
+dname = "reg.ru"
+
+
+test_conn = redis.Redis()
+
+for key, val in a.items():
+    test_conn.hset(dname, str(key), str(val))
+
+b = test_conn.hgetall(dname)
+c = {}
+for key, val in b.items():
+    c[key.decode("utf-8", "replace")] = list(val.decode("utf-8", "replace"))
+
+print(c)
+
+test_conn.setex("rere.ru", 60, "qweqweqwe")
+if not test_conn.hgetall("dnamee"):
+    print("1")
+else:
+    print("2")
