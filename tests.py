@@ -1,9 +1,17 @@
-"""import redis
+import redis
 
 
-test_conn = redis.Redis()
+"""test_conn = redis.Redis()
 
-dname = "reg.ru"
+import mysql.connector
+
+test_conn_db = mysql.connector.connect(
+    host="localhost", user="alexandr", password="1", database="mysqltest"
+)
+
+print(test_conn_db.ping())"""
+
+"""dname = "reg.ru"
 key = "fff"
 val = "aaa"
 key2 = "ggg"
@@ -24,7 +32,7 @@ import dns.resolver
 from utilits import MyException
 
 
-class MyClass:
+"""class MyClass:
     def __init__(self, a):
         self.a = a
 
@@ -41,7 +49,7 @@ class MyClass:
 zaz = MyClass(1)
 
 print(zaz.bab())
-print(zaz.aba())
+print(zaz.aba())"""
 
 """import re
 

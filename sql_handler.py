@@ -2,6 +2,8 @@ import mysql.connector
 from mysql.connector import Error
 
 
+from utilits import MyException
+
 method_conn = mysql.connector.connect(
     host="localhost", user="alexandr", password="1", database="mysqltest"
 )
@@ -24,6 +26,13 @@ PRIMARY KEY (id)
     print("Таблица создана")
 except Error as e:
     print(e)"""
+
+
+def check_connect_mariadb():
+    try:
+        method_conn.ping()
+    except mysql.connector.errors.DatabaseError:
+        raise MyException
 
 
 def add_data_in_mariadb(dname, method, success_value):

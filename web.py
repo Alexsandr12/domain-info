@@ -2,7 +2,7 @@ import json
 
 from flask import Flask, request
 
-from controller import Controller
+from controller import ControllerPost, ControllerGet
 from config import INDENT
 
 app = Flask(__name__)
@@ -16,7 +16,7 @@ app = Flask(__name__)
 def get_whois_text():
     domains = request.json["domain"]
     use_cache = request.json["use_cache"]
-    whois_text_dnames = Controller(domains, "get_whois_text", use_cache).forming_response()
+    whois_text_dnames = ControllerPost(domains, "get_whois_text", use_cache).forming_response()
     return json.dumps(whois_text_dnames, indent=INDENT, ensure_ascii=False)
 
 
@@ -24,7 +24,7 @@ def get_whois_text():
 def get_whois_info():
     domains = request.json["domain"]
     use_cache = request.json["use_cache"]
-    whois_info_dnames = Controller(domains, "get_whois_info", use_cache).forming_response()
+    whois_info_dnames = ControllerPost(domains, "get_whois_info", use_cache).forming_response()
     return json.dumps(whois_info_dnames, indent=INDENT, ensure_ascii=False)
 
 
@@ -32,7 +32,7 @@ def get_whois_info():
 def get_http_info():
     domains = request.json["domain"]
     use_cache = request.json["use_cache"]
-    http_info_domains = Controller(domains, "get_http_info", use_cache).forming_response()
+    http_info_domains = ControllerPost(domains, "get_http_info", use_cache).forming_response()
     return json.dumps(http_info_domains, indent=INDENT, ensure_ascii=False)
 
 
@@ -40,7 +40,7 @@ def get_http_info():
 def get_dns_info():
     domains = request.json["domain"]
     use_cache = request.json["use_cache"]
-    dns_info_domains = Controller(domains, "get_dns_info", use_cache).forming_response()
+    dns_info_domains = ControllerPost(domains, "get_dns_info", use_cache).forming_response()
     return json.dumps(dns_info_domains, indent=INDENT, ensure_ascii=False)
 
 
@@ -48,8 +48,14 @@ def get_dns_info():
 def get_all_info():
     domains = request.json["domain"]
     use_cache = request.json["use_cache"]
-    all_info_domains = Controller(domains, "get_all_info", use_cache).forming_response()
+    all_info_domains = ControllerPost(domains, "get_all_info", use_cache).forming_response()
     return json.dumps(all_info_domains, indent=INDENT, ensure_ascii=False)
+
+
+@app.route("/get_servise_status", methods=["GET"])
+def get_servise_status():
+    servise_status = ControllerGet().check_connect_DB()
+    return json.dumps(servise_status, indent=INDENT, ensure_ascii=False)
 
 
 if __name__ == "__main__":

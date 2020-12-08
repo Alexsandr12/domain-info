@@ -3,19 +3,42 @@ import requests
 from whois_info import get_whois_text, get_whois_info
 from http_info import get_http_info
 from dns_info import get_dns_records
-from redis_handler import check_cache_redis, rec_redis, check_dns_info, rec_dns_info
+from redis_handler import check_cache_redis, rec_redis, check_dns_info, rec_dns_info, check_connect_redis
+from sql_handler import add_data_in_mariadb, check_connect_mariadb
 from utilits import encoding_domains, decode_domain, MyException
-from sql_handler import add_data_in_mariadb
 from validation import Validation
 
+# TODO попробовать сделать отдельный метод для sql и redis
+# TODO доработать проверку соединения. Мария выдает разные ошибки
 
-class Controller:
+class ControllerGet:
+
+    def check_connect_DB(self):
+        servise_status = {}
+        try:
+            check_connect_redis()
+            servise_status["status"] = 'successful'
+        except MyException as err:
+            servise_status["status"] = 'error'
+            servise_status['error'] = err.REDIS_ERROR
+        try:
+            check_connect_mariadb()
+        except MyException as err:
+            servise_status["status"] = 'error'
+            if servise_status['error'] == err.REDIS_ERROR:
+                servise_status['error'] = err.DB_ERROR
+            else:
+                servise_status['error'] = err.SQL_BD_ERROR
+        return servise_status
+
+class ControllerPost:
     def __init__(self, domains, method, use_cache):
         self.domains_puny = encoding_domains(domains)
         self.method = method
         self.use_cache = use_cache
 
     def forming_response(self):
+
         response = {}
         try:
             domains = self.validation_domains()

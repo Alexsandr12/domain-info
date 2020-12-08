@@ -1,11 +1,17 @@
 import redis
 
 from config import EXPIRED_RECORD
+from utilits import MyException
 
 redis_conn = redis.Redis()
 
-
 # TODO decode для dns_info, чтобы выводились списки, а не строки с записями
+
+def check_connect_redis():
+    try:
+        redis_conn.ping()
+    except redis.exceptions.ConnectionError:
+        raise MyException
 
 
 def check_cache_redis(dname, method):
@@ -35,3 +41,4 @@ def rec_dns_info(dname, method, dns_info):
     for type_record, val_record in dns_info.items():
         redis_conn.hset(f"{method}:{dname}", type_record, str(val_record))
     redis_conn.expire(f"{method}:{dname}", EXPIRED_RECORD)
+
