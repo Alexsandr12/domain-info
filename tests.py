@@ -24,22 +24,24 @@ import dns.resolver
 from utilits import MyException
 
 
-"""class MyClass:
+class MyClass:
     def __init__(self, a):
         self.a = a
-        self.a = self.bab()
 
     def bab(self):
+        if self.a == 1:
+            self.a = 2
         c = self.a + 1
         return c
 
     def aba(self):
-        b = self.bab()
+        b = self.a + 1
         return b
 
 zaz = MyClass(1)
 
-print(zaz.bab())"""
+print(zaz.bab())
+print(zaz.aba())
 
 """import re
 
@@ -55,7 +57,7 @@ else:
     print('2')"""
 
 
-import redis
+"""import redis
 
 a = {"a": [1, 2, 3], "b": [2, 3, 4]}
 dname = "reg.ru"
@@ -77,4 +79,4 @@ test_conn.setex("rere.ru", 60, "qweqweqwe")
 if not test_conn.hgetall("dnamee"):
     print("1")
 else:
-    print("2")
+    print("2")"""

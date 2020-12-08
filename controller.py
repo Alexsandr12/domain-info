@@ -9,16 +9,11 @@ from sql_handler import add_data_in_mariadb
 from validation import Validation
 
 
-# TODO dns_info запись в редис как строку
-# TODO 2 класса, один работает с доменами, другой только методы
-# TODO  либо отдельный модуль для redis либо внутри текущих модулей
-# TODO добавить условие актуальности редис
-
-
 class Controller:
-    def __init__(self, domains, method):
+    def __init__(self, domains, method, use_cache):
         self.domains_puny = encoding_domains(domains)
         self.method = method
+        self.use_cache = use_cache
 
     def forming_response(self):
         response = {}
@@ -52,15 +47,17 @@ class Controller:
         return response
 
     def whois_text(self, dname):
-        whois_text = check_cache_redis(dname, self.method)
+        whois_text = None
+        if self.use_cache == "True":
+            whois_text = check_cache_redis(dname, "get_whois_text")
         if whois_text is None:
             try:
                 whois_text = get_whois_text(dname)
             except MyException as err:
-                add_data_in_mariadb(dname, self.method, False)
+                add_data_in_mariadb(dname, "get_whois_text", False)
                 return err.GETTING_WHOIS_TEXT_ERROR
-            rec_redis(dname, self.method, whois_text)
-            add_data_in_mariadb(dname, self.method, True)
+            rec_redis(dname, "get_whois_text", whois_text)
+            add_data_in_mariadb(dname, "get_whois_text", True)
         return whois_text
 
     def whois_info(self, dname):
@@ -69,17 +66,19 @@ class Controller:
             return whois_text
         try:
             whois_info = get_whois_info(whois_text)
-            add_data_in_mariadb(dname, self.method, True)
+            add_data_in_mariadb(dname, "get_whois_info", True)
         except MyException as err:
             whois_info = err.DOMAIN_NOT_REGISTRED
-            add_data_in_mariadb(dname, self.method, False)
+            add_data_in_mariadb(dname, "get_whois_info", False)
         return whois_info
 
     def http_info(self, dname):
-        http_info = check_cache_redis(dname, self.method)
+        http_info = None
+        if self.use_cache == "True":
+            http_info = check_cache_redis(dname, "get_http_info")
         if http_info is None:
             http_info = self.forming_response_http(dname)
-            rec_redis(dname, self.method, http_info)
+            rec_redis(dname, "get_http_info", http_info)
         self.forming_http_method_mariadb(dname, http_info)
         return http_info
 
@@ -92,20 +91,22 @@ class Controller:
 
     def forming_http_method_mariadb(self, dname, http_info):
         if MyException.GETTING_HTTP_INFO_ERROR in http_info:
-            add_data_in_mariadb(dname, self.method, False)
+            add_data_in_mariadb(dname, "get_http_info", False)
         else:
-            add_data_in_mariadb(dname, self.method, True)
+            add_data_in_mariadb(dname, "get_http_info", True)
 
     def dns_info(self, dname):
-        dns_info = check_dns_info(dname, self.method)
+        dns_info = None
+        if self.use_cache == "True":
+            dns_info = check_dns_info(dname, "get_dns_info")
         if not dns_info:
             try:
                 dns_info = get_dns_records(dname)
             except MyException as err:
-                add_data_in_mariadb(dname, self.method, False)
+                add_data_in_mariadb(dname, "get_dns_info", False)
                 return err.GETTING_DNS_INFO_ERROR
-        add_data_in_mariadb(dname, self.method, True)
-        rec_dns_info(dname, self.method, dns_info)
+        add_data_in_mariadb(dname, "get_dns_info", True)
+        rec_dns_info(dname, "get_dns_info", dns_info)
         return dns_info
 
     def get_all_info_domains(self, dname):
