@@ -31,7 +31,7 @@ except Error as e:
 def check_connect_mariadb():
     try:
         method_conn.ping()
-    except mysql.connector.errors.DatabaseError:
+    except mysql.connector.errors.InterfaceError:
         raise MyException
 
 
@@ -41,3 +41,4 @@ def add_data_in_mariadb(dname, method, success_value):
         VALUES ( %s, %s, %s)"""
     method_cursor.execute(query, (dname, method, success_value))
     method_conn.commit()
+

@@ -1,7 +1,7 @@
 import redis
 
 
-"""test_conn = redis.Redis()
+test_conn = redis.Redis()
 
 import mysql.connector
 
@@ -9,7 +9,7 @@ test_conn_db = mysql.connector.connect(
     host="localhost", user="alexandr", password="1", database="mysqltest"
 )
 
-print(test_conn_db.ping())"""
+print(test_conn_db.ping())
 
 """dname = "reg.ru"
 key = "fff"
@@ -88,3 +88,11 @@ if not test_conn.hgetall("dnamee"):
     print("1")
 else:
     print("2")"""
+
+"""def qwe():
+    a = {}
+    a = {'a':"123"}
+    a["a"] = "345"
+    print(a.get("a"))
+
+qwe()"""

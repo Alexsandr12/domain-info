@@ -9,7 +9,7 @@ from utilits import encoding_domains, decode_domain, MyException
 from validation import Validation
 
 # TODO попробовать сделать отдельный метод для sql и redis
-# TODO доработать проверку соединения. Мария выдает разные ошибки
+# TODO доработать проверку соединения. Мария после перезапуска созданяет ошибку в servise_status
 
 class ControllerGet:
 
@@ -25,10 +25,10 @@ class ControllerGet:
             check_connect_mariadb()
         except MyException as err:
             servise_status["status"] = 'error'
-            if servise_status['error'] == err.REDIS_ERROR:
-                servise_status['error'] = err.DB_ERROR
-            else:
+            if servise_status.get('error') is None:
                 servise_status['error'] = err.SQL_BD_ERROR
+            else:
+                servise_status['error'] = err.DB_ERROR
         return servise_status
 
 class ControllerPost:
