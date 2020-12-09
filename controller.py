@@ -9,7 +9,7 @@ from utilits import encoding_domains, decode_domain, MyException
 from validation import Validation
 
 # TODO попробовать сделать отдельный метод для sql и redis
-# TODO доработать проверку соединения. Мария после перезапуска созданяет ошибку в servise_status
+# TODO доработать проверку соединения. Мария после перезапуска все равно выдает ошибку
 
 class ControllerGet:
 
@@ -38,7 +38,11 @@ class ControllerPost:
         self.use_cache = use_cache
 
     def forming_response(self):
-
+        try:
+            check_connect_mariadb()
+            check_connect_redis()
+        except MyException as err:
+            return err.GENERAL_ERROR
         response = {}
         try:
             domains = self.validation_domains()

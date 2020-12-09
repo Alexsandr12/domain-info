@@ -24,3 +24,4 @@ class MyException(Exception):
     SQL_BD_ERROR = "SQL_BD_ERROR"
     REDIS_ERROR = "REDIS_ERROR"
     DB_ERROR = "DB_ERROR"
+    GENERAL_ERROR = "GENERAL_ERROR"
