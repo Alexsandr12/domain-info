@@ -58,5 +58,10 @@ def get_servise_status():
     return json.dumps(servise_status, indent=INDENT, ensure_ascii=False)
 
 
+@app.route("/get_all_cached_domains", methods=["GET"])
+def get_all_cached_domains():
+    all_domains = ControllerGet().get_all_cached_domains()
+    return json.dumps(all_domains, ensure_ascii=False)
+
 if __name__ == "__main__":
     app.run()

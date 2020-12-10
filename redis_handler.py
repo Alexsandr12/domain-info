@@ -42,3 +42,11 @@ def rec_dns_info(dname, method, dns_info):
         redis_conn.hset(f"{method}:{dname}", type_record, str(val_record))
     redis_conn.expire(f"{method}:{dname}", EXPIRED_RECORD)
 
+
+def get_all_key():
+    all_key = []
+    for key in redis_conn.scan_iter():
+        all_key.append(key.decode("utf-8", "replace"))
+    return all_key
+
+redis_conn.flushdb()

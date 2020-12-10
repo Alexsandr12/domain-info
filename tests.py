@@ -9,7 +9,6 @@ test_conn_db = mysql.connector.connect(
     host="localhost", user="alexandr", password="1", database="mysqltest"
 )
 
-print(test_conn_db.ping())
 
 """dname = "reg.ru"
 key = "fff"
@@ -96,3 +95,6 @@ else:
     print(a.get("a"))
 
 qwe()"""
+
+a = set()
+

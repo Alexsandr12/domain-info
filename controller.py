@@ -3,7 +3,7 @@ import requests
 from whois_info import get_whois_text, get_whois_info
 from http_info import get_http_info
 from dns_info import get_dns_records
-from redis_handler import check_cache_redis, rec_redis, check_dns_info, rec_dns_info, check_connect_redis
+from redis_handler import check_cache_redis, rec_redis, check_dns_info, rec_dns_info, check_connect_redis, get_all_key
 from sql_handler import add_data_in_mariadb, check_connect_mariadb
 from utilits import encoding_domains, decode_domain, MyException
 from validation import Validation
@@ -30,6 +30,16 @@ class ControllerGet:
             else:
                 servise_status['error'] = err.DB_ERROR
         return servise_status
+
+    def get_all_cached_domains(self):
+        all_cached_domains = []
+        all_key_redis = get_all_key()
+        for key in all_key_redis:
+            key = key.split(":")
+            dname = decode_domain(key[1])
+            all_cached_domains.append(dname)
+        all_cached_domains = set(all_cached_domains)
+        return list(all_cached_domains)
 
 class ControllerPost:
     def __init__(self, domains, method, use_cache):
