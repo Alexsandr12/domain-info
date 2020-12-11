@@ -7,6 +7,7 @@ redis_conn = redis.Redis()
 
 # TODO decode для dns_info, чтобы выводились списки, а не строки с записями
 
+
 def check_connect_redis():
     try:
         redis_conn.ping()
@@ -48,5 +49,3 @@ def get_all_key():
     for key in redis_conn.scan_iter():
         all_key.append(key.decode("utf-8", "replace"))
     return all_key
-
-redis_conn.flushdb()

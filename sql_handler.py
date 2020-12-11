@@ -42,3 +42,8 @@ def add_data_in_mariadb(dname, method, success_value):
     method_cursor.execute(query, (dname, method, success_value))
     method_conn.commit()
 
+
+def get_all_data():
+    query = f"SELECT * FROM used_methods"
+    method_cursor.execute(query)
+    return method_cursor.fetchall()

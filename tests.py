@@ -96,5 +96,11 @@ else:
 
 qwe()"""
 
-a = set()
+a = {}
 
+a["s"] = "1"
+
+if not a["a"]:
+    print("true")
+else:
+    print("false")

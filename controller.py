@@ -3,32 +3,40 @@ import requests
 from whois_info import get_whois_text, get_whois_info
 from http_info import get_http_info
 from dns_info import get_dns_records
-from redis_handler import check_cache_redis, rec_redis, check_dns_info, rec_dns_info, check_connect_redis, get_all_key
-from sql_handler import add_data_in_mariadb, check_connect_mariadb
+from redis_handler import (
+    check_cache_redis,
+    rec_redis,
+    check_dns_info,
+    rec_dns_info,
+    check_connect_redis,
+    get_all_key,
+)
+from sql_handler import add_data_in_mariadb, check_connect_mariadb, get_all_data
 from utilits import encoding_domains, decode_domain, MyException
 from validation import Validation
+
 
 # TODO попробовать сделать отдельный метод для sql и redis
 # TODO доработать проверку соединения. Мария после перезапуска все равно выдает ошибку
 
-class ControllerGet:
 
+class ControllerGet:
     def check_connect_DB(self):
         servise_status = {}
         try:
             check_connect_redis()
-            servise_status["status"] = 'successful'
+            servise_status["status"] = "successful"
         except MyException as err:
-            servise_status["status"] = 'error'
-            servise_status['error'] = err.REDIS_ERROR
+            servise_status["status"] = "error"
+            servise_status["error"] = err.REDIS_ERROR
         try:
             check_connect_mariadb()
         except MyException as err:
-            servise_status["status"] = 'error'
-            if servise_status.get('error') is None:
-                servise_status['error'] = err.SQL_BD_ERROR
+            servise_status["status"] = "error"
+            if servise_status.get("error") is None:
+                servise_status["error"] = err.SQL_BD_ERROR
             else:
-                servise_status['error'] = err.DB_ERROR
+                servise_status["error"] = err.DB_ERROR
         return servise_status
 
     def get_all_cached_domains(self):
@@ -40,6 +48,29 @@ class ControllerGet:
             all_cached_domains.append(dname)
         all_cached_domains = set(all_cached_domains)
         return list(all_cached_domains)
+
+    def get_info_from_sql(self):
+        info_from_sql = {}
+        sql_all_data = get_all_data()
+        for sql_data in sql_all_data:
+            sql_data = list(sql_data)
+            if sql_data[4] == 0:
+                sql_data[4] = False
+            else:
+                sql_data[4] = True
+            if info_from_sql.get(sql_data[1]) is None:
+                info_from_sql[sql_data[1]] = []
+            info_from_sql[sql_data[1]].append(
+                {
+                    "id": sql_data[0],
+                    "data": f"{sql_data[2].year}.{sql_data[2].month}.{sql_data[2].day}",
+                    "time": f"{sql_data[2].hour}:{sql_data[2].minute}:{sql_data[2].second}",
+                    "method": sql_data[3],
+                    "status": sql_data[4],
+                }
+            )
+        return info_from_sql
+
 
 class ControllerPost:
     def __init__(self, domains, method, use_cache):
