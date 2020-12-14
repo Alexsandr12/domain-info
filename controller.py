@@ -14,15 +14,15 @@ from redis_handler import (
 from sql_handler import add_data_in_mariadb, check_connect_mariadb, get_all_data
 from utilits import encoding_domains, decode_domain, MyException
 from validation import Validation
+from logger import logger_expenses
 
 
 # TODO попробовать сделать отдельный метод для sql и redis
-# TODO доработать проверку соединения. Мария после перезапуска все равно выдает ошибку
-
+# TODO доделать логер для всех модулей
 
 class ControllerGet:
     def check_connect_DB(self):
-        servise_status = {"status":"successful"}
+        servise_status = {"status": "successful"}
         try:
             check_connect_redis()
         except MyException as err:
@@ -82,6 +82,7 @@ class ControllerGet:
 
 class ControllerPost:
     def __init__(self, domains, method, use_cache):
+        self.domains = domains
         self.domains_puny = encoding_domains(domains)
         self.method = method
         self.use_cache = use_cache
@@ -91,11 +92,17 @@ class ControllerPost:
             check_connect_mariadb()
             check_connect_redis()
         except MyException as err:
+            logger_expenses.exception(
+                f"Запрос клиента: метод: {self.method}, домены: {self.domains}, use_cache: {self.use_cache}. Ответ: {err.GENERAL_ERROR}"
+            )
             return err.GENERAL_ERROR
         response = {}
         try:
             domains = self.validation_domains()
         except MyException as err:
+            logger_expenses.exception(
+                f"Запрос клиента: метод: {self.method}, домены: {self.domains}, use_cache: {self.use_cache}. Ответ: {err.DOMAINS_LIMIT_EXCEEDED}"
+            )
             return err.DOMAINS_LIMIT_EXCEEDED
         for dname in domains["domains_valid"]:
             response_from_nethod = self.get_response_from_method(dname)
@@ -103,6 +110,9 @@ class ControllerPost:
             response[dname] = response_from_nethod
         if domains["domains_not_valid"]:
             response["Invalid domain names"] = domains["domains_not_valid"]
+        logger_expenses.debug(
+            f"Запрос клиента: метод: {self.method}, домены: {self.domains}, use_cache: {self.use_cache}. Ответ: {response}"
+        )
         return response
 
     def validation_domains(self):

@@ -1,0 +1,84 @@
+2020-12-15 01:03:27,568 - DEBUG - controller - Запрос клиента: метод: get_dns_info, домены: ['reg.ru', 'ма.рф', 'мама.рф', 'маdfbма.рф', 'werqerw'], use_cache: True. Ответ: {'reg.ru': {'A': ['194.58.116.31'], 'AAAA': ['2a00:f940:4::8'], 'NS': ['ns2.reg.ru.', 'ns1.reg.ru.'], 'TXT': ['google-site-verification=T4VNp49mW_sdFhdRpJaLVqpX0tsxhvqE1muQIqn53XM', 'google-site-verification=iNCOGvgecL33MECdRd7KzXu_rvl2o7ndJtZtk5mL7dA', 'google-site-verification=QqRtBwaD2VYUYhHYTwXcdLtu4n0WnLSYvbZGrqBSuAc', 'mailru-verification: dbe01c84e25720a0', 'google-site-verification=C2fqzBtaO7m79tR37QPhe2yx_Y35JFYtt6556Gmtt8I', 'v=spf1 ip4:87.242.73.97 ip4:151.248.124.12 ip4:31.31.204.0/24 ip4:194.58.116.0/24 ip4:31.31.205.0/24 ip4:89.208.17.22 ip4:151.248.124.12 ip4:95.213.135.163 ip4:89.108.89.3 ip6:2a00:f940:0:8000::2 include:aspmx.googlemail.com  include:__spf_opensrs.reg.ru " "include:__spf_publicdomainregistry.reg.ru ~all'], 'MX': ['10 aspmx3.googlemail.com.', '5 alt1.aspmx.l.google.com.', '9 aspmx2.googlemail.com.', '1 aspmx.l.google.com.', '6 alt2.aspmx.l.google.com.'], 'CNAME': None}, 'ма.рф': {'A': ['90.156.201.13', '90.156.201.79', '90.156.201.46', '90.156.201.38'], 'AAAA': ['2a00:15f8:a000:5:1:11:2:4163', '2a00:15f8:a000:5:1:14:2:4163', '2a00:15f8:a000:5:1:13:2:4163', '2a00:15f8:a000:5:1:12:2:4163'], 'NS': ['ns2.masterhost.ru.', 'ns.masterhost.ru.', 'ns1.masterhost.ru.'], 'TXT': None, 'MX': None, 'CNAME': None}, 'мама.рф': 'GETTING_DNS_INFO_ERROR', 'маdfbма.рф': 'GETTING_DNS_INFO_ERROR', 'Invalid domain names': ['werqerw']}
+2020-12-15 01:10:42,722 - DEBUG - controller - Запрос клиента: метод: get_dns_info, домены: ['reg.ru', 'ма.рф', 'мама.рф', 'маdfbма.рф', 'werqerw'], use_cache: True. Ответ: {'reg.ru': {'AAAA': "['2a00:f940:4::8']", 'NS': "['ns2.reg.ru.', 'ns1.reg.ru.']", 'CNAME': 'None', 'A': "['194.58.116.31']", 'TXT': '[\'google-site-verification=T4VNp49mW_sdFhdRpJaLVqpX0tsxhvqE1muQIqn53XM\', \'google-site-verification=iNCOGvgecL33MECdRd7KzXu_rvl2o7ndJtZtk5mL7dA\', \'google-site-verification=QqRtBwaD2VYUYhHYTwXcdLtu4n0WnLSYvbZGrqBSuAc\', \'mailru-verification: dbe01c84e25720a0\', \'google-site-verification=C2fqzBtaO7m79tR37QPhe2yx_Y35JFYtt6556Gmtt8I\', \'v=spf1 ip4:87.242.73.97 ip4:151.248.124.12 ip4:31.31.204.0/24 ip4:194.58.116.0/24 ip4:31.31.205.0/24 ip4:89.208.17.22 ip4:151.248.124.12 ip4:95.213.135.163 ip4:89.108.89.3 ip6:2a00:f940:0:8000::2 include:aspmx.googlemail.com  include:__spf_opensrs.reg.ru " "include:__spf_publicdomainregistry.reg.ru ~all\']', 'MX': "['10 aspmx3.googlemail.com.', '5 alt1.aspmx.l.google.com.', '9 aspmx2.googlemail.com.', '1 aspmx.l.google.com.', '6 alt2.aspmx.l.google.com.']"}, 'ма.рф': {'AAAA': "['2a00:15f8:a000:5:1:11:2:4163', '2a00:15f8:a000:5:1:14:2:4163', '2a00:15f8:a000:5:1:13:2:4163', '2a00:15f8:a000:5:1:12:2:4163']", 'NS': "['ns2.masterhost.ru.', 'ns.masterhost.ru.', 'ns1.masterhost.ru.']", 'CNAME': 'None', 'A': "['90.156.201.13', '90.156.201.79', '90.156.201.46', '90.156.201.38']", 'TXT': 'None', 'MX': 'None'}, 'мама.рф': 'GETTING_DNS_INFO_ERROR', 'маdfbма.рф': 'GETTING_DNS_INFO_ERROR', 'Invalid domain names': ['werqerw']}
+2020-12-15 01:12:45,955 - ERROR - controller - Запрос клиента: метод: get_dns_info, домены: ['reg.ru', 'ма.рф', 'мама.рф', 'маdfbма.рф', 'werqerw'], use_cache: True. Ответ: GENERAL_ERROR
+Traceback (most recent call last):
+  File "/home/alexandr/.local/lib/python3.8/site-packages/redis/connection.py", line 1189, in get_connection
+    if connection.can_read():
+  File "/home/alexandr/.local/lib/python3.8/site-packages/redis/connection.py", line 725, in can_read
+    return self._parser.can_read(timeout)
+  File "/home/alexandr/.local/lib/python3.8/site-packages/redis/connection.py", line 318, in can_read
+    return self._buffer and self._buffer.can_read(timeout)
+  File "/home/alexandr/.local/lib/python3.8/site-packages/redis/connection.py", line 230, in can_read
+    self._read_from_socket(timeout=timeout,
+  File "/home/alexandr/.local/lib/python3.8/site-packages/redis/connection.py", line 201, in _read_from_socket
+    raise ConnectionError(SERVER_CLOSED_CONNECTION_ERROR)
+redis.exceptions.ConnectionError: Connection closed by server.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/alexandr/.local/lib/python3.8/site-packages/redis/connection.py", line 550, in connect
+    sock = self._connect()
+  File "/home/alexandr/.local/lib/python3.8/site-packages/redis/connection.py", line 606, in _connect
+    raise err
+  File "/home/alexandr/.local/lib/python3.8/site-packages/redis/connection.py", line 594, in _connect
+    sock.connect(socket_address)
+ConnectionRefusedError: [Errno 111] Connection refused
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/alexandr/Рабочий стол/python/flask_app/domain-info/redis_handler.py", line 13, in check_connect_redis
+    redis_conn.ping()
+  File "/home/alexandr/.local/lib/python3.8/site-packages/redis/client.py", line 1378, in ping
+    return self.execute_command('PING')
+  File "/home/alexandr/.local/lib/python3.8/site-packages/redis/client.py", line 898, in execute_command
+    conn = self.connection or pool.get_connection(command_name, **options)
+  File "/home/alexandr/.local/lib/python3.8/site-packages/redis/connection.py", line 1193, in get_connection
+    connection.connect()
+  File "/home/alexandr/.local/lib/python3.8/site-packages/redis/connection.py", line 554, in connect
+    raise ConnectionError(self._error_message(e))
+redis.exceptions.ConnectionError: Error 111 connecting to localhost:6379. Connection refused.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/alexandr/Рабочий стол/python/flask_app/domain-info/controller.py", line 94, in forming_response
+    check_connect_redis()
+  File "/home/alexandr/Рабочий стол/python/flask_app/domain-info/redis_handler.py", line 15, in check_connect_redis
+    raise MyException
+utilits.MyException
+2020-12-15 01:15:23,141 - ERROR - controller - Запрос клиента: метод: get_dns_info, домены: ['reg.ru', 'ма.рф', 'мама.рф', 'маdfbма.рф', 'werqerw'], use_cache: True. Ответ: GENERAL_ERROR
+2020-12-15 01:16:25,045 - ERROR - controller - Запрос клиента: метод: get_dns_info, домены: ['reg.ru', 'ма.рф', 'мама.рф', 'маdfbма.рф', 'werqerw'], use_cache: True. Ответ: GENERAL_ERROR
+Traceback (most recent call last):
+  File "/home/alexandr/.local/lib/python3.8/site-packages/redis/connection.py", line 550, in connect
+    sock = self._connect()
+  File "/home/alexandr/.local/lib/python3.8/site-packages/redis/connection.py", line 606, in _connect
+    raise err
+  File "/home/alexandr/.local/lib/python3.8/site-packages/redis/connection.py", line 594, in _connect
+    sock.connect(socket_address)
+ConnectionRefusedError: [Errno 111] Connection refused
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/alexandr/Рабочий стол/python/flask_app/domain-info/redis_handler.py", line 13, in check_connect_redis
+    redis_conn.ping()
+  File "/home/alexandr/.local/lib/python3.8/site-packages/redis/client.py", line 1378, in ping
+    return self.execute_command('PING')
+  File "/home/alexandr/.local/lib/python3.8/site-packages/redis/client.py", line 898, in execute_command
+    conn = self.connection or pool.get_connection(command_name, **options)
+  File "/home/alexandr/.local/lib/python3.8/site-packages/redis/connection.py", line 1183, in get_connection
+    connection.connect()
+  File "/home/alexandr/.local/lib/python3.8/site-packages/redis/connection.py", line 554, in connect
+    raise ConnectionError(self._error_message(e))
+redis.exceptions.ConnectionError: Error 111 connecting to localhost:6379. Connection refused.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/alexandr/Рабочий стол/python/flask_app/domain-info/controller.py", line 94, in forming_response
+    check_connect_redis()
+  File "/home/alexandr/Рабочий стол/python/flask_app/domain-info/redis_handler.py", line 15, in check_connect_redis
+    raise MyException
+utilits.MyException
