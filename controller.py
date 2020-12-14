@@ -22,10 +22,9 @@ from validation import Validation
 
 class ControllerGet:
     def check_connect_DB(self):
-        servise_status = {}
+        servise_status = {"status":"successful"}
         try:
             check_connect_redis()
-            servise_status["status"] = "successful"
         except MyException as err:
             servise_status["status"] = "error"
             servise_status["error"] = err.REDIS_ERROR
@@ -40,6 +39,10 @@ class ControllerGet:
         return servise_status
 
     def get_all_cached_domains(self):
+        try:
+            check_connect_redis()
+        except MyException as err:
+            return err.REDIS_ERROR
         all_cached_domains = []
         all_key_redis = get_all_key()
         for key in all_key_redis:
@@ -50,6 +53,10 @@ class ControllerGet:
         return list(all_cached_domains)
 
     def get_info_from_sql(self):
+        try:
+            check_connect_mariadb()
+        except MyException as err:
+            return err.SQL_BD_ERROR
         info_from_sql = {}
         sql_all_data = get_all_data()
         for sql_data in sql_all_data:
@@ -58,9 +65,10 @@ class ControllerGet:
                 sql_data[4] = False
             else:
                 sql_data[4] = True
-            if info_from_sql.get(sql_data[1]) is None:
-                info_from_sql[sql_data[1]] = []
-            info_from_sql[sql_data[1]].append(
+            dname = decode_domain(sql_data[1])
+            if info_from_sql.get(dname) is None:
+                info_from_sql[dname] = []
+            info_from_sql[dname].append(
                 {
                     "id": sql_data[0],
                     "data": f"{sql_data[2].year}.{sql_data[2].month}.{sql_data[2].day}",
@@ -130,7 +138,7 @@ class ControllerPost:
 
     def whois_info(self, dname):
         whois_text = self.whois_text(dname)
-        if whois_text == "GETTING_WHOIS_TEXT_ERROR":
+        if whois_text == MyException.GETTING_WHOIS_TEXT_ERROR:
             return whois_text
         try:
             whois_info = get_whois_info(whois_text)

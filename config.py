@@ -1,5 +1,6 @@
 """web.py"""
 INDENT = 4
+ENSURE_ASCII = False
 
 """whois_info.py"""
 WHOIS_TIMEOUT = 3
@@ -20,3 +21,9 @@ IP_ROOT_DNS = "193.232.128.6"
 
 """validation.py"""
 LIMIT_DOMAINS = 5
+
+"""sql_handler.py"""
+HOST = "localhost"
+USER = "alexandr"
+PASSWORD = "1"
+DATABASE = "mysqltest"

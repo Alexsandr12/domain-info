@@ -30,12 +30,12 @@ def check_dns_info(dname, method):
     dns_info = redis_conn.hgetall(f"{method}:{dname}")
     if dns_info:
         dns_info_decode = {}
-        for key, val in dns_info.items():
-            dns_info_decode[key.decode("utf-8", "replace")] = val.decode(
+        for type_record, val_record in dns_info.items():
+            dns_info_decode[type_record.decode("utf-8", "replace")] = val_record.decode(
                 "utf-8", "replace"
             )
         return dns_info_decode
-    return dns_info
+    return None
 
 
 def rec_dns_info(dname, method, dns_info):

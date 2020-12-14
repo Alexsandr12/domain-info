@@ -3,9 +3,10 @@ from mysql.connector import Error
 
 
 from utilits import MyException
+from config import HOST, USER, PASSWORD, DATABASE
 
 method_conn = mysql.connector.connect(
-    host="localhost", user="alexandr", password="1", database="mysqltest"
+    host=HOST, user=USER, password=PASSWORD, database=DATABASE
 )
 
 method_cursor = method_conn.cursor()
