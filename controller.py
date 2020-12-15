@@ -14,7 +14,7 @@ from redis_handler import (
 from sql_handler import add_data_in_mariadb, check_connect_mariadb, get_all_data
 from utilits import encoding_domains, decode_domain, MyException
 from validation import Validation
-from logger import logger_expenses
+from logger import logger_client, rec_logger_method
 
 
 # TODO попробовать сделать отдельный метод для sql и redis
@@ -92,7 +92,7 @@ class ControllerPost:
             check_connect_mariadb()
             check_connect_redis()
         except MyException as err:
-            logger_expenses.exception(
+            logger_client.exception(
                 f"Запрос клиента: метод: {self.method}, домены: {self.domains}, use_cache: {self.use_cache}. Ответ: {err.GENERAL_ERROR}"
             )
             return err.GENERAL_ERROR
@@ -100,7 +100,7 @@ class ControllerPost:
         try:
             domains = self.validation_domains()
         except MyException as err:
-            logger_expenses.exception(
+            logger_client.exception(
                 f"Запрос клиента: метод: {self.method}, домены: {self.domains}, use_cache: {self.use_cache}. Ответ: {err.DOMAINS_LIMIT_EXCEEDED}"
             )
             return err.DOMAINS_LIMIT_EXCEEDED
@@ -110,7 +110,7 @@ class ControllerPost:
             response[dname] = response_from_nethod
         if domains["domains_not_valid"]:
             response["Invalid domain names"] = domains["domains_not_valid"]
-        logger_expenses.debug(
+        logger_client.debug(
             f"Запрос клиента: метод: {self.method}, домены: {self.domains}, use_cache: {self.use_cache}. Ответ: {response}"
         )
         return response
@@ -130,6 +130,10 @@ class ControllerPost:
             response = self.dns_info(dname)
         elif self.method == "get_all_info":
             response = self.get_all_info_domains(dname)
+        """logger_method.debug(
+            f"Метод: {self.method}, домен: {dname}, use_cache: {self.use_cache}, return метода : {response}"
+        )"""
+        rec_logger_method(self.method, dname, self.use_cache, response)
         return response
 
     def whois_text(self, dname):
