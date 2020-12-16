@@ -75,10 +75,10 @@ def get_all_cached_domains():
     return json.dumps(all_domains, ensure_ascii=ENSURE_ASCII)
 
 
-@app.route("/get_info_from_sql", methods=["GET"])
-def get_info_from_sql():
-    info_from_sql = ControllerGet().get_info_from_sql()
-    return json.dumps(info_from_sql, indent=INDENT, ensure_ascii=ENSURE_ASCII)
+@app.route("/get_info_from_mariadb", methods=["GET"])
+def get_info_from_mariadb():
+    info_from_mariadb = ControllerGet().get_info_from_mariadb()
+    return json.dumps(info_from_mariadb, indent=INDENT, ensure_ascii=ENSURE_ASCII)
 
 
 if __name__ == "__main__":

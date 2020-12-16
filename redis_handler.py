@@ -19,7 +19,7 @@ def check_cache_redis(dname, method):
     cache = redis_conn.get(f"{method}:{dname}")
     if cache:
         return cache.decode("utf-8", "replace")
-    return cache
+    return None
 
 
 def rec_redis(dname, method, info):

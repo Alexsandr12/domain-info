@@ -3,6 +3,7 @@ import dns.message
 import dns.query
 import dns.flags
 import dns.resolver
+
 from utilits import MyException
 from config import TYPE_RECORDS, PAYLOAD, DNS_TIMEOUT, IP_ROOT_DNS
 
@@ -33,6 +34,28 @@ for rdata in answers.response.answer:
 # TODO подумать как записать в redis словать с данными
 
 
+def get_dns_records(dname: str):
+    records_of_dname = {}
+    ip_nserver = get_ip_of_dns(dname)
+    for type_record in TYPE_RECORDS:
+        query = dns.message.make_query(
+            dname, dns.rdatatype.from_text(type_record), payload=PAYLOAD
+        )
+        response = dns.query.udp(query, ip_nserver, timeout=DNS_TIMEOUT)
+        values_record = parsing_values_record(response)
+        records_of_dname[type_record] = values_record
+    if records_of_dname["NS"] is None:
+        raise MyException
+    return records_of_dname
+
+
+def get_ip_of_dns(dname):
+    dns_of_dname = get_dns_of_dname(dname)
+    rrset_ip_of_dns = dns.resolver.resolve(dns_of_dname)
+    for ip_adresses_of_dns in rrset_ip_of_dns.response.answer:
+        return str(ip_adresses_of_dns[0])
+
+
 def get_dns_of_dname(dname):
     query = dns.message.make_query(
         dname, dns.rdatatype.from_text("ns"), payload=PAYLOAD
@@ -47,29 +70,7 @@ def get_dns_of_dname(dname):
     return dns_of_dname
 
 
-def get_ip_of_dns(dname):
-    dns_of_dname = get_dns_of_dname(dname)
-    answers = dns.resolver.resolve(dns_of_dname)
-    for rdata in answers.response.answer:
-        return str(rdata[0])
-
-
-def get_dns_records(dname: str):
-    records_of_dname = {}
-    ip_nserver = get_ip_of_dns(dname)
-    for type_record in TYPE_RECORDS:
-        query = dns.message.make_query(
-            dname, dns.rdatatype.from_text(type_record), payload=PAYLOAD
-        )
-        response = dns.query.udp(query, ip_nserver, timeout=DNS_TIMEOUT)
-        values_record = get_records_from_response(response)
-        records_of_dname[type_record] = values_record
-    if records_of_dname["NS"] is None:
-        raise MyException
-    return records_of_dname
-
-
-def get_records_from_response(response):
+def parsing_values_record(response):
     values_record = []
     if not response.answer:
         values_record = None

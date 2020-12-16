@@ -1,7 +1,5 @@
 import logging
 
-# TODO почему функция дублирует логи
-
 logging.basicConfig(level=logging.DEBUG)
 logger_client = logging.getLogger("logger_client")
 client_handler = logging.FileHandler("client_log.log")

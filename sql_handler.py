@@ -1,7 +1,6 @@
 import mysql.connector
 from mysql.connector import Error
 
-
 from utilits import MyException
 from config import HOST, USER, PASSWORD, DATABASE
 
@@ -36,7 +35,7 @@ def check_connect_mariadb():
         raise MyException
 
 
-def add_data_in_mariadb(dname, method, success_value):
+def rec_method_status_mariadb(dname, method, success_value):
     query = f"""INSERT INTO used_methods 
         ( domain, methods, success) 
         VALUES ( %s, %s, %s)"""
@@ -44,7 +43,7 @@ def add_data_in_mariadb(dname, method, success_value):
     method_conn.commit()
 
 
-def get_all_data():
+def get_all_data_mariadb():
     query = f"SELECT * FROM used_methods"
     method_cursor.execute(query)
     return method_cursor.fetchall()

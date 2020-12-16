@@ -32,18 +32,18 @@ def get_whois_text(dname: str) -> str:
     return response.decode("utf-8", "replace")
 
 
-def get_whois_info(whois_text):
+def parsing_whois_text(whois_text):
     if "created" not in whois_text:
         raise MyException
     whois_text = whois_text.split("\n")
     whois_info = {}
     number_server = 0
-    whois_text = whois_text[5:-5]
-    for whois in whois_text:
-        whois = whois.split(":", maxsplit=1)
-        if whois[0] != "nserver":
-            whois_info[whois[0]] = whois[1].strip()
+    interested_info_whois_text = whois_text[5:-5]
+    for whois_string in interested_info_whois_text:
+        whois_string = whois_string.split(":", maxsplit=1)
+        if whois_string[0] != "nserver":
+            whois_info[whois_string[0]] = whois_string[1].strip()
         else:
             number_server += 1
-            whois_info[f"nserver {number_server}"] = whois[1].strip()
+            whois_info[f"nserver {number_server}"] = whois_string[1].strip()
     return whois_info
