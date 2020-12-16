@@ -14,11 +14,19 @@ from redis_handler import (
 from sql_handler import add_data_in_mariadb, check_connect_mariadb, get_all_data
 from utilits import encoding_domains, decode_domain, MyException
 from validation import Validation
-from logger import logger_client, rec_logger_method
+from logger import (
+    logger_client,
+    logger_get_all_info,
+    logger_get_dns_info,
+    logger_get_http_info,
+    logger_get_whois_info,
+    logger_get_whois_text,
+)
 
 
 # TODO попробовать сделать отдельный метод для sql и redis
 # TODO доделать логер для всех модулей
+
 
 class ControllerGet:
     def check_connect_DB(self):
@@ -122,18 +130,30 @@ class ControllerPost:
     def get_response_from_method(self, dname):
         if self.method == "get_whois_text":
             response = self.whois_text(dname)
+            logger_get_whois_text.debug(
+                f"Метод: {self.method}, домен: {dname}, use_cache: {self.use_cache}, return метода : {response}"
+            )
         elif self.method == "get_whois_info":
             response = self.whois_info(dname)
+            logger_get_whois_info.debug(
+                f"Метод: {self.method}, домен: {dname}, use_cache: {self.use_cache}, return метода : {response}"
+            )
         elif self.method == "get_http_info":
             response = self.http_info(dname)
+            logger_get_http_info.debug(
+                f"Метод: {self.method}, домен: {dname}, use_cache: {self.use_cache}, return метода : {response}"
+            )
         elif self.method == "get_dns_info":
             response = self.dns_info(dname)
+            logger_get_dns_info.debug(
+                f"Метод: {self.method}, домен: {dname}, use_cache: {self.use_cache}, return метода : {response}"
+            )
         elif self.method == "get_all_info":
             response = self.get_all_info_domains(dname)
-        """logger_method.debug(
-            f"Метод: {self.method}, домен: {dname}, use_cache: {self.use_cache}, return метода : {response}"
-        )"""
-        rec_logger_method(self.method, dname, self.use_cache, response)
+            logger_get_all_info.debug(
+                f"Метод: {self.method}, домен: {dname}, use_cache: {self.use_cache}, return метода : {response}"
+            )
+        # rec_logger_method(self.method, dname, self.use_cache, response)
         return response
 
     def whois_text(self, dname):
