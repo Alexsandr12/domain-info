@@ -34,7 +34,7 @@ for rdata in answers.response.answer:
 # TODO подумать как записать в redis словать с данными
 
 
-def get_dns_records(dname: str):
+def search_dns_records(dname: str):
     records_of_dname = {}
     ip_nserver = get_ip_of_dns(dname)
     for type_record in TYPE_RECORDS:

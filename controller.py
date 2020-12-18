@@ -1,8 +1,8 @@
 import requests
 
-from whois_info import get_whois_text, parsing_whois_text
-from http_info import get_http_info
-from dns_info import get_dns_records
+from whois_info import search_whois_text, parsing_whois_text
+from http_info import search_http_info
+from dns_info import search_dns_records
 from redis_handler import (
     check_cache_redis,
     rec_redis,
@@ -122,7 +122,7 @@ class ControllerPost:
                 f"Ответ: {err.DOMAINS_LIMIT_EXCEEDED}"
             )
             return err.DOMAINS_LIMIT_EXCEEDED
-        response = self.work_with_domains(domains)
+        response = self.collecting_response_from_method(domains)
         logger_client.debug(
             f"Запрос клиента: метод: {self.method}, домены: {self.domains}, use_cache: {self.use_cache}. "
             f"Ответ: {response}"
@@ -133,57 +133,57 @@ class ControllerPost:
         Validation(self.domains_puny).checking_len_domains()
         return Validation(self.domains_puny).checking_valid_domains()
 
-    def work_with_domains(self, domains):
+    def collecting_response_from_method(self, domains):
         response = {}
         for dname in domains["domains_valid"]:
-            response_from_nethod = self.get_response_from_method(dname)
+            response_dname = self.get_response_from_method(dname)
             dname = decode_domain(dname)
-            response[dname] = response_from_nethod
+            response[dname] = response_dname
         if domains["domains_not_valid"]:
             response["Invalid domain names"] = domains["domains_not_valid"]
         return response
 
     def get_response_from_method(self, dname):
         if self.method == "get_whois_text":
-            response = self.whois_text(dname)
+            response_dname = self.get_whois_text(dname)
             logger_get_whois_text.debug(
                 f"Метод: {self.method}, домен: {dname}, use_cache: {self.use_cache}, "
-                f"return метода : {response}"
+                f"return метода : {response_dname}"
             )
         elif self.method == "get_whois_info":
-            response = self.whois_info(dname)
+            response_dname = self.get_whois_info(dname)
             logger_get_whois_info.debug(
                 f"Метод: {self.method}, домен: {dname}, use_cache: {self.use_cache}, "
-                f"return метода : {response}"
+                f"return метода : {response_dname}"
             )
         elif self.method == "get_http_info":
-            response = self.http_info(dname)
+            response_dname = self.get_http_info(dname)
             logger_get_http_info.debug(
                 f"Метод: {self.method}, домен: {dname}, use_cache: {self.use_cache}, "
-                f"return метода : {response}"
+                f"return метода : {response_dname}"
             )
         elif self.method == "get_dns_info":
-            response = self.dns_info(dname)
+            response_dname = self.get_dns_info(dname)
             logger_get_dns_info.debug(
                 f"Метод: {self.method}, домен: {dname}, use_cache: {self.use_cache}, "
-                f"return метода : {response}"
+                f"return метода : {response_dname}"
             )
         elif self.method == "get_all_info":
-            response = self.get_all_info_domains(dname)
+            response_dname = self.get_all_info_domains(dname)
             logger_get_all_info.debug(
                 f"Метод: {self.method}, домен: {dname}, use_cache: {self.use_cache}, "
-                f"return метода : {response}"
+                f"return метода : {response_dname}"
             )
         # rec_logger_method(self.method, dname, self.use_cache, response)
-        return response
+        return response_dname
 
-    def whois_text(self, dname):
+    def get_whois_text(self, dname):
         whois_text = None
         if self.use_cache == "True":
             whois_text = check_cache_redis(dname, "get_whois_text")
         if whois_text is None:
             try:
-                whois_text = get_whois_text(dname)
+                whois_text = search_whois_text(dname)
             except MyException as err:
                 rec_method_status_mariadb(dname, "get_whois_text", False)
                 return err.GETTING_WHOIS_TEXT_ERROR
@@ -191,8 +191,8 @@ class ControllerPost:
             rec_method_status_mariadb(dname, "get_whois_text", True)
         return whois_text
 
-    def whois_info(self, dname):
-        whois_text = self.whois_text(dname)
+    def get_whois_info(self, dname):
+        whois_text = self.get_whois_text(dname)
         if whois_text == MyException.GETTING_WHOIS_TEXT_ERROR:
             return whois_text
         try:
@@ -203,36 +203,36 @@ class ControllerPost:
             rec_method_status_mariadb(dname, "get_whois_info", False)
         return whois_info
 
-    def http_info(self, dname):
+    def get_http_info(self, dname):
         http_info = None
         if self.use_cache == "True":
             http_info = check_cache_redis(dname, "get_http_info")
         if http_info is None:
-            http_info = self.forming_response_http(dname)
+            http_info = self.forming_response_http_info(dname)
             rec_redis(dname, "get_http_info", http_info)
-        self.forming_http_method_mariadb(dname, http_info)
+        self.rec_http_info_mariadb(dname, http_info)
         return http_info
 
-    def forming_response_http(self, dname):
+    def forming_response_http_info(self, dname):
         try:
-            http_info = get_http_info(dname)
+            http_info = search_http_info(dname)
             return f"code: {http_info[0]}, https: {http_info[1]}"
         except requests.exceptions.RequestException:
             return MyException.GETTING_HTTP_INFO_ERROR
 
-    def forming_http_method_mariadb(self, dname, http_info):
+    def rec_http_info_mariadb(self, dname, http_info):
         if MyException.GETTING_HTTP_INFO_ERROR in http_info:
             rec_method_status_mariadb(dname, "get_http_info", False)
         else:
             rec_method_status_mariadb(dname, "get_http_info", True)
 
-    def dns_info(self, dname):
+    def get_dns_info(self, dname):
         dns_info = None
         if self.use_cache == "True":
             dns_info = check_dns_info(dname, "get_dns_info")
         if not dns_info:
             try:
-                dns_info = get_dns_records(dname)
+                dns_info = search_dns_records(dname)
             except MyException as err:
                 rec_method_status_mariadb(dname, "get_dns_info", False)
                 return err.GETTING_DNS_INFO_ERROR
@@ -242,8 +242,8 @@ class ControllerPost:
 
     def get_all_info_domains(self, dname):
         all_info = {}
-        all_info["whois_text"] = self.whois_text(dname)
-        all_info["whois_info"] = self.whois_info(dname)
-        all_info["http_info"] = self.http_info(dname)
-        all_info["dns_info"] = self.dns_info(dname)
+        all_info["whois_text"] = self.get_whois_text(dname)
+        all_info["whois_info"] = self.get_whois_info(dname)
+        all_info["http_info"] = self.get_http_info(dname)
+        all_info["dns_info"] = self.get_dns_info(dname)
         return all_info

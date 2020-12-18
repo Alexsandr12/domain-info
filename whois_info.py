@@ -4,7 +4,7 @@ from config import WHOIS_TIMEOUT, PORT, WHOIS_SERVER
 from utilits import MyException
 
 
-def get_whois_text(dname: str) -> str:
+def search_whois_text(dname: str) -> str:
     """Получаем whois доменов с ответственного whois-сервера.
 
     Args:

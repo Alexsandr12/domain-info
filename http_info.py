@@ -3,7 +3,7 @@ import requests
 from config import REQTIMEOUT
 
 
-def get_http_info(dname):
+def search_http_info(dname):
     try:
         response = requests.get(f"https://{dname}", verify=True, timeout=REQTIMEOUT)
         return [response.status_code, "True"]
