@@ -14,7 +14,12 @@ app = Flask(__name__)
 
 
 @app.route("/get_whois_text", methods=["POST"])
-def get_whois_text():
+def get_whois_text() -> str:
+    """Route для вызова метода get_whois_text из controller
+
+    :return:
+        str: результат вызова метода
+    """
     domains = request.json["domain"]
     use_cache = request.json["use_cache"]
     whois_text_dnames = ControllerPost(
@@ -24,7 +29,12 @@ def get_whois_text():
 
 
 @app.route("/get_whois_info", methods=["POST"])
-def get_whois_info():
+def get_whois_info() -> str:
+    """Route для вызова метода get_whois_info из controller
+
+        :return:
+            str: результат вызова метода
+        """
     domains = request.json["domain"]
     use_cache = request.json["use_cache"]
     whois_info_dnames = ControllerPost(
@@ -34,7 +44,12 @@ def get_whois_info():
 
 
 @app.route("/get_http_info", methods=["POST"])
-def get_http_info():
+def get_http_info() -> str:
+    """Route для вызова метода get_http_info из controller
+
+    :return:
+        str: результат вызова метода
+    """
     domains = request.json["domain"]
     use_cache = request.json["use_cache"]
     http_info_domains = ControllerPost(
@@ -44,7 +59,12 @@ def get_http_info():
 
 
 @app.route("/get_dns_info", methods=["POST"])
-def get_dns_info():
+def get_dns_info() -> str:
+    """Route для вызова метода get_dns_info из controller
+
+    :return:
+        str: результат вызова метода
+    """
     domains = request.json["domain"]
     use_cache = request.json["use_cache"]
     dns_info_domains = ControllerPost(
@@ -54,7 +74,12 @@ def get_dns_info():
 
 
 @app.route("/get_all_info", methods=["POST"])
-def get_all_info():
+def get_all_info() -> str:
+    """Route для вызова метода get_all_info из controller
+
+    :return:
+        str: результат вызова метода
+    """
     domains = request.json["domain"]
     use_cache = request.json["use_cache"]
     all_info_domains = ControllerPost(
@@ -64,19 +89,34 @@ def get_all_info():
 
 
 @app.route("/get_servise_status", methods=["GET"])
-def get_servise_status():
+def get_servise_status() -> str:
+    """Запрос статуса подключения к базам данных
+
+    :return:
+        str: результат запроса
+    """
     servise_status = ControllerGet().check_connect_DB()
     return json.dumps(servise_status, indent=INDENT, ensure_ascii=ENSURE_ASCII)
 
 
 @app.route("/get_all_cached_domains", methods=["GET"])
-def get_all_cached_domains():
+def get_all_cached_domains() -> str:
+    """Запрос всех закэшированных доменов из redis
+
+    :return:
+        str: результат запроса
+    """
     all_domains = ControllerGet().get_all_cached_domains()
     return json.dumps(all_domains, ensure_ascii=ENSURE_ASCII)
 
 
 @app.route("/get_info_from_mariadb", methods=["GET"])
-def get_info_from_mariadb():
+def get_info_from_mariadb() -> str:
+    """Запрос всей информации из mariadb
+
+    :return:
+        str: результат запроса
+    """
     info_from_mariadb = ControllerGet().get_info_from_mariadb()
     return json.dumps(info_from_mariadb, indent=INDENT, ensure_ascii=ENSURE_ASCII)
 

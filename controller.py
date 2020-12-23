@@ -1,4 +1,5 @@
 import requests
+from typing import Dict, List, Union
 
 from whois_info import search_whois_text, parsing_whois_text
 from http_info import search_http_info
@@ -28,11 +29,15 @@ from logger import (
 )
 
 
-# TODO проверить названия методов, переменных и переспотреть код с whois_text
-
-
 class ControllerGet:
-    def check_connect_DB(self):
+    """ Методы для get запросов"""
+
+    def check_connect_DB(self) -> Dict[str:str]:
+        """Получение и формирование инфы о статусе подключения от баз данных
+
+        :return:
+            dict: словарь со статусом соединения и ошибкой, если она имеется
+        """
         servise_status = {"status": "successful"}
         try:
             check_connect_redis()
@@ -49,7 +54,12 @@ class ControllerGet:
                 servise_status["error"] = err.DB_ERROR
         return servise_status
 
-    def get_all_cached_domains(self):
+    def get_all_cached_domains(self) -> Union[str, List[str]]:
+        """Получение всех закэшированных доменов из redis
+
+        :return:
+            Union[str, List[str]]: сообщение о ошибке соединения с базой данных или список с доменами
+        """
         try:
             check_connect_redis()
         except MyException as err:
@@ -63,7 +73,13 @@ class ControllerGet:
         all_cached_domains = set(all_cached_domains)
         return list(all_cached_domains)
 
-    def get_info_from_mariadb(self):
+    def get_info_from_mariadb(self) -> Union[str, Dict[str:list]]:
+        """Получение всей информации из mariadb
+
+        :return:
+            Union[str, Dict[str:list]]: сообщение о ошибке соединения с базой данных или словарь с доменами и списками
+            записей из db для домена
+        """
         try:
             check_connect_mariadb()
         except MyException as err:
@@ -89,16 +105,35 @@ class ControllerGet:
             )
         return info_from_mariadb
 
-    def analysis_success_field_record(self, success_field):
+    def analysis_success_field_record(self, success_field: int) -> bool:
+        """Проверка значения статуса метода
+
+        :param
+            success_field: 0 или 1
+        :return:
+            bool: статус выполнения метода
+        """
         if success_field == 0:
-            val_success_field = False
+            return False
         else:
-            val_success_field = True
-        return val_success_field
+            return True
 
 
 class ControllerPost:
-    def __init__(self, domains, method, use_cache):
+    """Методы для пост запросов"""
+
+    def __init__(self, domains: list, method: str, use_cache: str):
+        """
+        Args:
+            domains: список доменов
+            method: метод
+            use_cache: True или False, нужна ли проверка в данных в кэше
+        Attributes:
+            domains: список доменов
+            domains_puny: список доменов в кодировке punycode
+            method: метод
+            use_cache: True или False, нужна ли проверка в данных в кэше
+        """
         self.domains = domains
         self.domains_puny = encoding_domains(domains)
         self.method = method
