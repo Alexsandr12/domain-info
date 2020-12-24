@@ -15,10 +15,10 @@ app = Flask(__name__)
 
 @app.route("/get_whois_text", methods=["POST"])
 def get_whois_text() -> str:
-    """Route для вызова метода get_whois_text из controller
+    """Route запроса инфы из controller по передаваемым параметрам
 
     :return:
-        str: результат вызова метода
+        str: ответ за запрос
     """
     domains = request.json["domain"]
     use_cache = request.json["use_cache"]
@@ -30,10 +30,10 @@ def get_whois_text() -> str:
 
 @app.route("/get_whois_info", methods=["POST"])
 def get_whois_info() -> str:
-    """Route для вызова метода get_whois_info из controller
+    """Route запроса инфы из controller по передаваемым параметрам
 
         :return:
-            str: результат вызова метода
+            str: ответ за запрос
         """
     domains = request.json["domain"]
     use_cache = request.json["use_cache"]
@@ -45,10 +45,10 @@ def get_whois_info() -> str:
 
 @app.route("/get_http_info", methods=["POST"])
 def get_http_info() -> str:
-    """Route для вызова метода get_http_info из controller
+    """Route запроса инфы из controller по передаваемым параметрам
 
     :return:
-        str: результат вызова метода
+        str: ответ за запрос
     """
     domains = request.json["domain"]
     use_cache = request.json["use_cache"]
@@ -60,10 +60,10 @@ def get_http_info() -> str:
 
 @app.route("/get_dns_info", methods=["POST"])
 def get_dns_info() -> str:
-    """Route для вызова метода get_dns_info из controller
+    """Route запроса инфы из controller по передаваемым параметрам
 
     :return:
-        str: результат вызова метода
+        str: ответ за запрос
     """
     domains = request.json["domain"]
     use_cache = request.json["use_cache"]
@@ -75,10 +75,10 @@ def get_dns_info() -> str:
 
 @app.route("/get_all_info", methods=["POST"])
 def get_all_info() -> str:
-    """Route для вызова метода get_all_info из controller
+    """Route запроса инфы из controller по передаваемым параметрам
 
     :return:
-        str: результат вызова метода
+        str: ответ за запрос
     """
     domains = request.json["domain"]
     use_cache = request.json["use_cache"]

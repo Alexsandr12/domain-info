@@ -32,7 +32,7 @@ from logger import (
 class ControllerGet:
     """ Методы для get запросов"""
 
-    def check_connect_DB(self) -> Dict[str:str]:
+    def check_connect_DB(self) -> Dict[str, str]:
         """Получение и формирование инфы о статусе подключения от баз данных
 
         :return:
@@ -73,7 +73,7 @@ class ControllerGet:
         all_cached_domains = set(all_cached_domains)
         return list(all_cached_domains)
 
-    def get_info_from_mariadb(self) -> Union[str, Dict[str:list]]:
+    def get_info_from_mariadb(self) -> Union[str, Dict[str, list]]:
         """Получение всей информации из mariadb
 
         :return:
@@ -139,7 +139,15 @@ class ControllerPost:
         self.method = method
         self.use_cache = use_cache
 
-    def forming_response(self):
+    def forming_response(self) -> Union[str, str, dict]:
+        """Основной модуль, проверяет подключение к бд и валидацию доменов,
+        если ошибки нет, собирает ответ для клиента
+
+        :return:
+            str: ошибка подключения к базам данных
+            str: ошибка колличества передаваемых доменов
+            dict: словарь с валидными доменами и ответом методов, и невалидными доменами
+        """
         try:
             check_connect_mariadb()
             check_connect_redis()
@@ -157,25 +165,37 @@ class ControllerPost:
                 f"Ответ: {err.DOMAINS_LIMIT_EXCEEDED}"
             )
             return err.DOMAINS_LIMIT_EXCEEDED
-        response = self.collecting_response_from_method(domains)
+        response = self.collecting_response_from_method(domains["domains_valid"])
+        if domains["domains_not_valid"]:
+            response["Invalid domain names"] = domains["domains_not_valid"]
         logger_client.debug(
             f"Запрос клиента: метод: {self.method}, домены: {self.domains}, use_cache: {self.use_cache}. "
             f"Ответ: {response}"
         )
         return response
 
-    def validation_domains(self):
+    def validation_domains(self) -> Dict[str, list]:
+        """Вызов методов для проверки валидации доменов
+
+        :return:
+            dict: словарь с валидными и не валидными доменами
+        """
         Validation(self.domains_puny).checking_len_domains()
         return Validation(self.domains_puny).checking_valid_domains()
 
-    def collecting_response_from_method(self, domains):
+    def collecting_response_from_method(self, domains: list) -> dict:
+        """Сбор ответов от методов для доменов
+
+        :param
+            domains: список доменов
+        :return:
+            dict: словарь с доменами и ответом методов
+        """
         response = {}
-        for dname in domains["domains_valid"]:
+        for dname in domains:
             response_dname = self.get_response_from_method(dname)
             dname = decode_domain(dname)
             response[dname] = response_dname
-        if domains["domains_not_valid"]:
-            response["Invalid domain names"] = domains["domains_not_valid"]
         return response
 
     def get_response_from_method(self, dname):
