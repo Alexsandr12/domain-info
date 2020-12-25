@@ -27,7 +27,7 @@ from logger import (
     logger_get_whois_info,
     logger_get_whois_text,
 )
-
+# TODO в методе get_response_from_method что такое  global response_dname
 
 class ControllerGet:
     """ Методы для get запросов"""
@@ -110,6 +110,7 @@ class ControllerGet:
 
         :param
             success_field: 0 или 1
+
         :return:
             bool: статус выполнения метода
         """
@@ -144,9 +145,8 @@ class ControllerPost:
         если ошибки нет, собирает ответ для клиента
 
         :return:
-            str: ошибка подключения к базам данных
-            str: ошибка колличества передаваемых доменов
-            dict: словарь с валидными доменами и ответом методов, и невалидными доменами
+            Union[str, str, dict]: ошибка подключения к базам данных/ошибка колличества передаваемых доменов/
+            словарь с валидными доменами и ответом методов, и невалидными доменами
         """
         try:
             check_connect_mariadb()
@@ -188,6 +188,7 @@ class ControllerPost:
 
         :param
             domains: список доменов
+
         :return:
             dict: словарь с доменами и ответом методов
         """
@@ -198,7 +199,17 @@ class ControllerPost:
             response[dname] = response_dname
         return response
 
-    def get_response_from_method(self, dname):
+    def get_response_from_method(self, dname: str) -> Union[str, dict]:
+        """Ответ от методов для домена
+
+        :param
+            dname: домен
+
+        :return:
+            Union[str, dict]: ответ от методов get_whois_text, get_http_info/
+            ответы от методов get_whois_info, get_dns_info, get_all_info
+        """
+        global response_dname
         if self.method == "get_whois_text":
             response_dname = self.get_whois_text(dname)
             logger_get_whois_text.debug(
@@ -232,7 +243,15 @@ class ControllerPost:
         # rec_logger_method(self.method, dname, self.use_cache, response)
         return response_dname
 
-    def get_whois_text(self, dname):
+    def get_whois_text(self, dname: str) -> Union[str, str]:
+        """Запрос whois текста для домена из кэша или из функции
+
+        :param
+            dname: домен
+
+        :return:
+            Union[str, str]: ошибка функции получения whois текста/ whois текст из кэша или ответ от функции
+        """
         whois_text = None
         if self.use_cache == "True":
             whois_text = check_cache_redis(dname, "get_whois_text")
@@ -246,7 +265,15 @@ class ControllerPost:
             rec_method_status_mariadb(dname, "get_whois_text", True)
         return whois_text
 
-    def get_whois_info(self, dname):
+    def get_whois_info(self, dname: str) -> Union[str, dict]:
+        """Запрос whois информации для домена
+
+        :param
+            dname: домен
+
+        :return:
+            Union[str, dict]: ошибка получения whois текста/ словарь с пунктами whois и их значениями для домена
+        """
         whois_text = self.get_whois_text(dname)
         if whois_text == MyException.GETTING_WHOIS_TEXT_ERROR:
             return whois_text
@@ -258,7 +285,15 @@ class ControllerPost:
             rec_method_status_mariadb(dname, "get_whois_info", False)
         return whois_info
 
-    def get_http_info(self, dname):
+    def get_http_info(self, dname: str) -> str:
+        """Запрос http инфо по домену в кэше, если нет то в функции
+
+        :param
+            dname: домен
+
+        :return:
+            str: http инфо из кэша или ответ от функции
+        """
         http_info = None
         if self.use_cache == "True":
             http_info = check_cache_redis(dname, "get_http_info")
@@ -268,20 +303,43 @@ class ControllerPost:
         self.rec_http_info_mariadb(dname, http_info)
         return http_info
 
-    def forming_response_http_info(self, dname):
+    def forming_response_http_info(self, dname: str) -> Union[str, str]:
+        """Формулировка ответа от функции поиска http информации
+
+        :param
+            dname: домен
+
+        :return:
+            Union[str, str]: ответ от функции/ ошибка поиска http информации
+        """
         try:
             http_info = search_http_info(dname)
             return f"code: {http_info[0]}, https: {http_info[1]}"
         except requests.exceptions.RequestException:
             return MyException.GETTING_HTTP_INFO_ERROR
 
-    def rec_http_info_mariadb(self, dname, http_info):
+    def rec_http_info_mariadb(self, dname: str, http_info: str):
+        """Запись данных в mariadb
+
+        :param
+            dname: домен
+            http_info: http информация по домену
+        """
         if MyException.GETTING_HTTP_INFO_ERROR in http_info:
             rec_method_status_mariadb(dname, "get_http_info", False)
         else:
             rec_method_status_mariadb(dname, "get_http_info", True)
 
-    def get_dns_info(self, dname):
+    def get_dns_info(self, dname: str) -> Union[str, dict]:
+        """Запрос dns записей для домена из кэша или из функции
+
+        :param
+            dname:домен
+
+        :return:
+            Union[str, dict]: ошибка функции поиска dns записей для домена/
+            словать с типами ресурсных записей и их значениями для доменов
+        """
         dns_info = None
         if self.use_cache == "True":
             dns_info = check_dns_info(dname, "get_dns_info")
@@ -295,7 +353,15 @@ class ControllerPost:
         rec_dns_info(dname, "get_dns_info", dns_info)
         return dns_info
 
-    def get_all_info_domains(self, dname):
+    def get_all_info_domains(self, dname: str) -> dict:
+        """Сбор информации для домена из всех post методов
+
+        :param
+            dname: домен
+
+        :return:
+            dict: словарь с методами и из ответами
+        """
         all_info = {}
         all_info["whois_text"] = self.get_whois_text(dname)
         all_info["whois_info"] = self.get_whois_info(dname)

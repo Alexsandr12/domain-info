@@ -1,3 +1,5 @@
+from typing import List, Dict
+
 import dns.name
 import dns.message
 import dns.query
@@ -31,10 +33,16 @@ for rdata in answers.response.answer:
     print(rdata[0])"""
 
 # TODO посмотреть с Женьком принты, как упростить или сделать понятнее получение данных из rrset
-# TODO подумать как записать в redis словать с данными
 
 
-def search_dns_records(dname: str):
+def search_dns_records(dname: str) -> Dict[str, str]:
+    """Поиск ресурсных записей для домена
+
+    :param
+        dname: домен
+    :return:
+        Dict[str, str]: словать с типами записей и их значениями
+    """
     records_of_dname = {}
     ip_nserver = get_ip_of_dns(dname)
     for type_record in TYPE_RECORDS:
@@ -49,14 +57,29 @@ def search_dns_records(dname: str):
     return records_of_dname
 
 
-def get_ip_of_dns(dname):
+def get_ip_of_dns(dname:str) -> str:
+    """Получение IP адреса DNS сервера домена
+
+    :param
+        dname: домен
+
+    :return:
+        str: ip адрес DNS сервера домена
+    """
     dns_of_dname = get_dns_of_dname(dname)
     rrset_ip_of_dns = dns.resolver.resolve(dns_of_dname)
     for ip_adresses_of_dns in rrset_ip_of_dns.response.answer:
         return str(ip_adresses_of_dns[0])
 
 
-def get_dns_of_dname(dname):
+def get_dns_of_dname(dname: str) -> str:
+    """Получение DNS-сервера домена c ответственного dns зоны
+
+    :param
+        dname: домен
+    :return:
+        str: DNS-сервер домена
+    """
     query = dns.message.make_query(
         dname, dns.rdatatype.from_text("ns"), payload=PAYLOAD
     )
@@ -70,7 +93,14 @@ def get_dns_of_dname(dname):
     return dns_of_dname
 
 
-def parsing_values_record(response):
+def parsing_values_record(response: str) -> List[str]:
+    """Парсинг значений ресурсной записи
+
+    :param
+        response: значения ресурсной записи
+    :return:
+        List[str]: список значений ресурсной записи
+    """
     values_record = []
     if not response.answer:
         values_record = None

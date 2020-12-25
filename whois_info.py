@@ -1,11 +1,12 @@
 import socket
+from typing import Dict
 
 from config import WHOIS_TIMEOUT, PORT, WHOIS_SERVER
 from utilits import MyException
 
 
 def search_whois_text(dname: str) -> str:
-    """Получаем whois доменов с ответственного whois-сервера.
+    """Получаем whois домена с ответственного whois-сервера.
 
     Args:
         dname: имя домена.
@@ -32,7 +33,15 @@ def search_whois_text(dname: str) -> str:
     return response.decode("utf-8", "replace")
 
 
-def parsing_whois_text(whois_text):
+def parsing_whois_text(whois_text: str) -> Dict[str, str]:
+    """Парсинг whois текста
+
+    :param
+        whois_text: whois текст
+
+    :return:
+        Dict[str, str]: словарь с полями whois и их значениями
+    """
     if "created" not in whois_text:
         raise MyException
     whois_text = whois_text.split("\n")
