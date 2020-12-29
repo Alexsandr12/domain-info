@@ -1,4 +1,5 @@
 import redis
+from typing import Union, List
 
 from config import EXPIRED_RECORD
 from utilits import MyException
@@ -9,24 +10,50 @@ redis_conn = redis.Redis()
 
 
 def check_connect_redis():
+    """Проверка доступа к redis"""
     try:
         redis_conn.ping()
     except redis.exceptions.ConnectionError:
         raise MyException
 
 
-def check_cache_redis(dname, method):
+def check_cache_redis(dname: str, method: str) -> Union[str, None]:
+    """Запрос данных их кэша по параметрам
+
+    :param
+        dname: домен
+        method: название метода
+
+    :return:
+        Union[str, None]: данные их кэша редиса или None, если нет данных по передаваемым параметрам
+    """
     cache = redis_conn.get(f"{method}:{dname}")
     if cache:
         return cache.decode("utf-8", "replace")
     return None
 
 
-def rec_redis(dname, method, info):
+def rec_redis(dname: str, method: str, info: str):
+    """Запись передаваемых данных
+
+    :param
+        dname: домен
+        method: название метода
+        info: передаваемые данные
+    """
     redis_conn.setex(f"{method}:{dname}", EXPIRED_RECORD, info)
 
 
-def check_dns_info(dname, method):
+def check_dns_info(dname: str, method: str) -> Union[dict, None]:
+    """Запрос из кэша dns-info по домену
+
+    :param
+        dname: домен
+        method: название метода
+
+    :return:
+        Union[dict, None]: словать с типами записей и их значениями или None
+    """
     dns_info = redis_conn.hgetall(f"{method}:{dname}")
     if dns_info:
         dns_info_decode = {}
@@ -38,13 +65,25 @@ def check_dns_info(dname, method):
     return None
 
 
-def rec_dns_info(dname, method, dns_info):
+def rec_dns_info(dname: str, method: str, dns_info: dict):
+    """Запись dns-info домена
+
+    :param
+        dname: домен
+        method: название метода
+        dns_info: ресурсные записи и их значения
+    """
     for type_record, val_record in dns_info.items():
         redis_conn.hset(f"{method}:{dname}", type_record, str(val_record))
     redis_conn.expire(f"{method}:{dname}", EXPIRED_RECORD)
 
 
-def get_all_key():
+def get_all_key() -> List[str]:
+    """Запрос всех ключей их кэша
+
+    :return:
+        List[str]: список со всеми включами
+    """
     all_key = []
     for key in redis_conn.scan_iter():
         all_key.append(key.decode("utf-8", "replace"))

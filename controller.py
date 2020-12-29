@@ -27,7 +27,9 @@ from logger import (
     logger_get_whois_info,
     logger_get_whois_text,
 )
+
 # TODO в методе get_response_from_method что такое  global response_dname
+
 
 class ControllerGet:
     """ Методы для get запросов"""

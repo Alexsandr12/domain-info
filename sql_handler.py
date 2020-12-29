@@ -29,13 +29,21 @@ except Error as e:
 
 
 def check_connect_mariadb():
+    """Проверка подключения к mariadb"""
     try:
         method_conn.ping()
     except mysql.connector.errors.InterfaceError:
         raise MyException
 
 
-def rec_method_status_mariadb(dname, method, success_value):
+def rec_method_status_mariadb(dname: str, method: str, success_value: bool):
+    """Запись информцаии о статусе выполнения метода
+
+    :param
+        dname: домен
+        method: название метода
+        success_value: статус выполнения метода
+    """
     query = f"""INSERT INTO used_methods 
         ( domain, methods, success) 
         VALUES ( %s, %s, %s)"""
@@ -43,7 +51,12 @@ def rec_method_status_mariadb(dname, method, success_value):
     method_conn.commit()
 
 
-def get_all_data_mariadb():
+def get_all_data_mariadb() -> List[tuple]:
+    """Получение всех данных из таблицы used_methods
+
+    :return:
+        List[tuple]: список со всеми строками таблицы
+    """
     query = f"SELECT * FROM used_methods"
     method_cursor.execute(query)
     return method_cursor.fetchall()

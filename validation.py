@@ -7,14 +7,28 @@ import re
 
 
 class Validation:
-    def __init__(self, domains):
+    """Валидация и проверка колличества доменом"""
+
+    def __init__(self, domains: list):
+        """
+        Args:
+            domains: список доменов
+        Attributes:
+            domains: список доменов
+        """
         self.domains = domains
 
     def checking_len_domains(self):
+        """Проверка количества доменов"""
         if len(self.domains) > LIMIT_DOMAINS:
             raise MyException
 
-    def checking_valid_domains(self):
+    def checking_valid_domains(self) -> Dict[str, list]:
+        """Разделение валидных и не валидных доменов
+
+        :return:
+            Dict[str, list]: словарь валидными и не валидными доменами
+        """
         domains = {"domains_valid": [], "domains_not_valid": []}
         for dname in self.domains:
             dname = dname.lower()

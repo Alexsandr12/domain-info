@@ -36,7 +36,7 @@ for rdata in answers.response.answer:
 
 
 def search_dns_records(dname: str) -> Dict[str, str]:
-    """Поиск ресурсных записей для домена
+    """Поиск ресурсных записей для домена с ответственного DNS-сервера
 
     :param
         dname: домен
@@ -57,7 +57,7 @@ def search_dns_records(dname: str) -> Dict[str, str]:
     return records_of_dname
 
 
-def get_ip_of_dns(dname:str) -> str:
+def get_ip_of_dns(dname: str) -> str:
     """Получение IP адреса DNS сервера домена
 
     :param
