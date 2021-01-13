@@ -1,0 +1,6 @@
+redis==3.5.2
+idna==2.8
+Flask==1.1.2
+requests==2.22.0
+dnspython==2.0.0
+mysql_connector_repackaged==0.3.1

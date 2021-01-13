@@ -1,4 +1,4 @@
-import redis
+"""import redis
 
 
 test_conn = redis.Redis()
@@ -7,7 +7,7 @@ import mysql.connector
 
 test_conn_db = mysql.connector.connect(
     host="localhost", user="alexandr", password="1", database="mysqltest"
-)
+)"""
 
 
 """dname = "reg.ru"
@@ -23,12 +23,12 @@ test_conn.expire(dname, 10)
 
 print(test_conn.hgetall(dname))"""
 
-import dns.name
+"""import dns.name
 import dns.message
 import dns.query
 import dns.flags
 import dns.resolver
-from utilits import MyException
+from utilits import MyException"""
 
 
 """class MyClass:
@@ -96,11 +96,4 @@ else:
 
 qwe()"""
 
-a = {}
-
-a["s"] = "1"
-
-if not a["a"]:
-    print("true")
-else:
-    print("false")
+print("Hello San9l!")

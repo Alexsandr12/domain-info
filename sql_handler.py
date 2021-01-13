@@ -1,5 +1,6 @@
 import mysql.connector
 from mysql.connector import Error
+from typing import List
 
 from utilits import MyException
 from config import HOST, USER, PASSWORD, DATABASE

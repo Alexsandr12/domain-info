@@ -1,6 +1,7 @@
 from config import LIMIT_DOMAINS
 from utilits import MyException
 import re
+from typing import Dict
 
 
 # TODO доделать валидацию, проверка всех допустимых символов
