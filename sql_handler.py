@@ -21,12 +21,12 @@ PRIMARY KEY (id)
 )
 """
 
-try:
+"""try:
     method_cursor.execute(create_table_data)
     method_conn.commit()
     #print("Таблица создана")
 except Error as e:
-    print(e)
+    print(e)"""
 
 
 def check_connect_mariadb():
