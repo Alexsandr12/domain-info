@@ -4,7 +4,6 @@ from flask import Flask, request
 
 from controller import ControllerPost, ControllerGet
 from config import INDENT, ENSURE_ASCII
-from datetime import datetime
 
 app = Flask(__name__)
 
