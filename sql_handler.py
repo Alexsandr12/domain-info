@@ -29,7 +29,7 @@ except Error as e:
     print(e)"""
 
 
-def check_connect_mariadb():
+def check_connect_sql():
     """Проверка подключения к mariadb"""
     try:
         method_conn.ping()
@@ -37,7 +37,7 @@ def check_connect_mariadb():
         raise BdErrors
 
 
-def rec_method_status_mariadb(dname: str, method: str, success_value: bool):
+def rec_method_status_sql(dname: str, method: str, success_value: bool):
     """Запись информцаии о статусе выполнения метода
 
     :param
@@ -52,7 +52,7 @@ def rec_method_status_mariadb(dname: str, method: str, success_value: bool):
     method_conn.commit()
 
 
-def get_all_data_mariadb() -> List[tuple]:
+def get_all_data_sql() -> List[tuple]:
     """Получение всех данных из таблицы used_methods
 
     :return:

@@ -90,16 +90,16 @@ def get_all_info() -> str:
     return json.dumps(all_info_domains, indent=INDENT, ensure_ascii=ENSURE_ASCII)
 
 
-@app.route("/get_servise_status", methods=["GET"])
-def get_servise_status() -> str:
+@app.route("/get_service_status", methods=["GET"])
+def get_service_status() -> str:
     """Запрос статуса подключения к базам данных
 
     :return:
         str: результат запроса
     """
-    servise_status = ControllerGet().check_connect_db()
+    service_status = ControllerGet().check_connect_db()
 
-    return json.dumps(servise_status, indent=INDENT, ensure_ascii=ENSURE_ASCII)
+    return json.dumps(service_status, indent=INDENT, ensure_ascii=ENSURE_ASCII)
 
 
 @app.route("/get_all_cached_domains", methods=["GET"])
@@ -114,16 +114,16 @@ def get_all_cached_domains() -> str:
     return json.dumps(all_domains, ensure_ascii=ENSURE_ASCII)
 
 
-@app.route("/get_info_from_mariadb", methods=["GET"])
-def get_info_from_mariadb() -> str:
+@app.route("/get_info_from_sql", methods=["GET"])
+def get_info_from_sql() -> str:
     """Запрос всей информации из mariadb
 
     :return:
         str: результат запроса
     """
-    info_from_mariadb = ControllerGet().get_info_from_mariadb()
+    info_from_sql = ControllerGet().get_info_from_sql()
 
-    return json.dumps(info_from_mariadb, indent=INDENT, ensure_ascii=ENSURE_ASCII)
+    return json.dumps(info_from_sql, indent=INDENT, ensure_ascii=ENSURE_ASCII)
 
 
 if __name__ == "__main__":

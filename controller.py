@@ -14,9 +14,9 @@ from redis_handler import (
     get_all_key,
 )
 from sql_handler import (
-    rec_method_status_mariadb,
-    check_connect_mariadb,
-    get_all_data_mariadb,
+    rec_method_status_sql,
+    check_connect_sql,
+    get_all_data_sql,
 )
 from utilits import encoding_domains, decode_domain
 from projectexception import (
@@ -39,7 +39,6 @@ from logger import (
 )
 
 # TODO в методе get_response_from_method что такое  global response_dname
-# TODO исправить servise на service
 # TODO убрать проверку подключения бд из модулей
 # TODO исправить mariadb на mysql
 
@@ -53,24 +52,24 @@ class ControllerGet:
         :return:
             dict: словарь со статусом соединения и ошибкой, если она имеется
         """
-        servise_status = {"status": "successful"}
+        service_status = {"status": "successful"}
 
         try:
             check_connect_redis()
         except BdErrors as err:
-            servise_status["status"] = "error"
-            servise_status["error"] = err.REDIS_ERROR
+            service_status["status"] = "error"
+            service_status["error"] = err.REDIS_ERROR
 
         try:
-            check_connect_mariadb()
+            check_connect_sql()
         except BdErrors as err:
-            servise_status["status"] = "error"
-            if servise_status.get("error"):
-                servise_status["error"] = err.DB_ERROR
+            service_status["status"] = "error"
+            if service_status.get("error"):
+                service_status["error"] = err.DB_ERROR
             else:
-                servise_status["error"] = err.MYSQL_ERROR
+                service_status["error"] = err.MYSQL_ERROR
 
-        return servise_status
+        return service_status
 
     def get_all_cached_domains(self) -> Union[str, List[str]]:
         """Получение всех закэшированных доменов из redis
@@ -92,7 +91,7 @@ class ControllerGet:
 
         return list(set(all_cached_domains))
 
-    def get_info_from_mariadb(self) -> Union[str, Dict[str, list]]:
+    def get_info_from_sql(self) -> Union[str, Dict[str, list]]:
         """Получение всей информации из mariadb
 
         :return:
@@ -100,27 +99,27 @@ class ControllerGet:
             записей из db для домена
         """
         try:
-            check_connect_mariadb()
+            check_connect_sql()
         except BdErrors as err:
             return err.MYSQL_ERROR
 
-        info_from_mariadb = defaultdict(list)
-        mariadb_all_data = get_all_data_mariadb()
-        for mariadb_record in mariadb_all_data:
-            mariadb_record = list(mariadb_record)
-            dname = decode_domain(mariadb_record[1])
-            datetime = mariadb_record[2]
-            info_from_mariadb[dname].append(
+        info_from_sql = defaultdict(list)
+        sql_all_data = get_all_data_sql()
+        for sql_record in sql_all_data:
+            sql_record = list(sql_record)
+            dname = decode_domain(sql_record[1])
+            datetime = sql_record[2]
+            info_from_sql[dname].append(
                 {
-                    "id": mariadb_record[0],
+                    "id": sql_record[0],
                     "data": f"{datetime.year}.{datetime.month}.{datetime.day}",
                     "time": f"{datetime.hour}:{datetime.minute}:{datetime.second}",
-                    "method": mariadb_record[3],
-                    "status": mariadb_record[4] == 0,
+                    "method": sql_record[3],
+                    "status": sql_record[4] == 0,
                 }
             )
 
-        return info_from_mariadb
+        return info_from_sql
 
 
 class ControllerPost:
@@ -161,7 +160,7 @@ class ControllerPost:
             словарь с валидными доменами и ответом методов, и невалидными доменами
         """
         try:
-            check_connect_mariadb()
+            check_connect_sql()
             check_connect_redis()
         except GeneralError as err:
             logger_client.exception(
@@ -250,10 +249,10 @@ class ControllerPost:
             try:
                 whois_text = search_whois_text(dname)
             except GettingWhoisTextError as err:
-                rec_method_status_mariadb(dname, "get_whois_text", False)
+                rec_method_status_sql(dname, "get_whois_text", False)
                 return err.text_err
             rec_redis(dname, "get_whois_text", whois_text)
-            rec_method_status_mariadb(dname, "get_whois_text", True)
+            rec_method_status_sql(dname, "get_whois_text", True)
 
         return whois_text
 
@@ -271,10 +270,10 @@ class ControllerPost:
             return whois_text
         try:
             whois_info = parsing_whois_text(whois_text)
-            rec_method_status_mariadb(dname, "get_whois_info", True)
+            rec_method_status_sql(dname, "get_whois_info", True)
         except DomainsNotRegistred as err:
             whois_info = err.text_err
-            rec_method_status_mariadb(dname, "get_whois_info", False)
+            rec_method_status_sql(dname, "get_whois_info", False)
         return whois_info
 
     def _get_http_info(self, dname: str) -> str:
@@ -292,7 +291,7 @@ class ControllerPost:
         if http_info is None:
             http_info = self._forming_response_http_info(dname)
             rec_redis(dname, "get_http_info", http_info)
-        self._rec_http_info_mariadb(dname, http_info)
+        self._rec_http_info_sql(dname, http_info)
         return http_info
 
     def _forming_response_http_info(self, dname: str) -> Union[str, str]:
@@ -310,7 +309,7 @@ class ControllerPost:
         except requests.exceptions.RequestException:
             return GettingHttpInfoError.text_err
 
-    def _rec_http_info_mariadb(self, dname: str, http_info: str):
+    def _rec_http_info_sql(self, dname: str, http_info: str):
         """Запись данных в mariadb
 
         :param
@@ -318,9 +317,9 @@ class ControllerPost:
             http_info: http информация по домену
         """
         if GettingHttpInfoError.text_err in http_info:
-            rec_method_status_mariadb(dname, "get_http_info", False)
+            rec_method_status_sql(dname, "get_http_info", False)
         else:
-            rec_method_status_mariadb(dname, "get_http_info", True)
+            rec_method_status_sql(dname, "get_http_info", True)
 
     def _get_dns_info(self, dname: str) -> Union[str, dict]:
         """Запрос dns записей для домена из кэша или из функции
@@ -339,9 +338,9 @@ class ControllerPost:
             try:
                 dns_info = search_dns_records(dname)
             except GettingDnsInfoError as err:
-                rec_method_status_mariadb(dname, "get_dns_info", False)
+                rec_method_status_sql(dname, "get_dns_info", False)
                 return err.text_err
-        rec_method_status_mariadb(dname, "get_dns_info", True)
+        rec_method_status_sql(dname, "get_dns_info", True)
         rec_dns_info(dname, "get_dns_info", dns_info)
         return dns_info
 
