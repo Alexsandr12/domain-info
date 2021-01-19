@@ -59,5 +59,10 @@ def get_all_data_sql() -> List[tuple]:
         List[tuple]: список со всеми строками таблицы
     """
     query = f"SELECT * FROM used_methods"
-    method_cursor.execute(query)
+
+    try:
+        method_cursor.execute(query)
+    except mysql.connector.errors.DatabaseError:
+        raise BdErrors
+
     return method_cursor.fetchall()

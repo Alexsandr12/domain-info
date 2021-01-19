@@ -27,6 +27,7 @@ def check_cache_redis(dname: str, method: str) -> Union[str, None]:
     :return:
         Union[str, None]: данные их кэша редиса или None, если нет данных по передаваемым параметрам
     """
+
     cache = redis_conn.get(f"{method}:{dname}")
     if cache:
         return cache.decode("utf-8", "replace")
@@ -85,6 +86,10 @@ def get_all_key() -> List[str]:
         List[str]: список со всеми включами
     """
     all_key = []
-    for key in redis_conn.scan_iter():
-        all_key.append(key.decode("utf-8", "replace"))
+    try:
+        for key in redis_conn.scan_iter():
+            all_key.append(key.decode("utf-8", "replace"))
+    except redis.exceptions.ConnectionError:
+        raise BdErrors
+
     return all_key

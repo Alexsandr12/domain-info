@@ -13,11 +13,7 @@ from redis_handler import (
     check_connect_redis,
     get_all_key,
 )
-from sql_handler import (
-    rec_method_status_sql,
-    check_connect_sql,
-    get_all_data_sql,
-)
+from sql_handler import rec_method_status_sql, check_connect_sql, get_all_data_sql
 from utilits import encoding_domains, decode_domain
 from projectexception import (
     GeneralError,
@@ -39,8 +35,6 @@ from logger import (
 )
 
 # TODO в методе get_response_from_method что такое  global response_dname
-# TODO убрать проверку подключения бд из модулей
-# TODO исправить mariadb на mysql
 
 
 class ControllerGet:
@@ -77,13 +71,12 @@ class ControllerGet:
         :return:
             Union[str, List[str]]: сообщение о ошибке соединения с базой данных или список с доменами
         """
+        all_cached_domains = []
         try:
-            check_connect_redis()
+            all_key_redis = get_all_key()
         except BdErrors as err:
             return err.REDIS_ERROR
 
-        all_cached_domains = []
-        all_key_redis = get_all_key()
         for key in all_key_redis:
             key = key.split(":")
             dname = decode_domain(key[1])
@@ -98,13 +91,12 @@ class ControllerGet:
             Union[str, Dict[str:list]]: сообщение о ошибке соединения с базой данных или словарь с доменами и списками
             записей из db для домена
         """
+        info_from_sql = defaultdict(list)
         try:
-            check_connect_sql()
+            sql_all_data = get_all_data_sql()
         except BdErrors as err:
             return err.MYSQL_ERROR
 
-        info_from_sql = defaultdict(list)
-        sql_all_data = get_all_data_sql()
         for sql_record in sql_all_data:
             sql_record = list(sql_record)
             dname = decode_domain(sql_record[1])
