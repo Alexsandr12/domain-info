@@ -2,7 +2,7 @@ import socket
 from typing import Dict
 
 from config import WHOIS_TIMEOUT, PORT, WHOIS_SERVER
-from utilits import MyException
+from projectexception import GettingWhoisTextError, DomainsNotRegistred
 
 
 def search_whois_text(dname: str) -> str:
@@ -23,7 +23,7 @@ def search_whois_text(dname: str) -> str:
             try:
                 data = sock.recv(4096)
             except socket.timeout:
-                raise MyException
+                raise GettingWhoisTextError
 
             if data:
                 response += data
@@ -43,7 +43,7 @@ def parsing_whois_text(whois_text: str) -> Dict[str, str]:
         Dict[str, str]: словарь с полями whois и их значениями
     """
     if "created" not in whois_text:
-        raise MyException
+        raise DomainsNotRegistred
     whois_text = whois_text.split("\n")
     whois_info = {}
     number_server = 0

@@ -2,7 +2,7 @@ import mysql.connector
 from mysql.connector import Error
 from typing import List
 
-from utilits import MyException
+from projectexception import BdErrors
 from config import HOST, USER, PASSWORD, DATABASE
 
 method_conn = mysql.connector.connect(
@@ -34,7 +34,7 @@ def check_connect_mariadb():
     try:
         method_conn.ping()
     except mysql.connector.errors.InterfaceError:
-        raise MyException
+        raise BdErrors
 
 
 def rec_method_status_mariadb(dname: str, method: str, success_value: bool):

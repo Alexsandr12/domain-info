@@ -7,7 +7,7 @@ from config import INDENT, ENSURE_ASCII
 
 app = Flask(__name__)
 
-#TODO поправить описание
+# TODO поправить описание
 
 
 @app.route("/get_whois_text", methods=["POST"])

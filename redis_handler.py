@@ -2,7 +2,7 @@ import redis
 from typing import Union, List
 
 from config import EXPIRED_RECORD
-from utilits import MyException
+from projectexception import BdErrors
 
 redis_conn = redis.Redis()
 
@@ -14,7 +14,7 @@ def check_connect_redis():
     try:
         redis_conn.ping()
     except redis.exceptions.ConnectionError:
-        raise MyException
+        raise BdErrors
 
 
 def check_cache_redis(dname: str, method: str) -> Union[str, None]:

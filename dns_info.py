@@ -6,7 +6,7 @@ import dns.query
 import dns.flags
 import dns.resolver
 
-from utilits import MyException
+from projectexception import GettingDnsInfoError
 from config import TYPE_RECORDS, PAYLOAD, DNS_TIMEOUT, IP_ROOT_DNS
 
 """domain = 'reg.ru'
@@ -53,7 +53,7 @@ def search_dns_records(dname: str) -> Dict[str, str]:
         values_record = parsing_values_record(response)
         records_of_dname[type_record] = values_record
     if records_of_dname["NS"] is None:
-        raise MyException
+        raise GettingDnsInfoError
     return records_of_dname
 
 
@@ -88,7 +88,7 @@ def get_dns_of_dname(dname: str) -> str:
     )
     rrset_ns = response.authority[0]
     if "IN NS" not in str(rrset_ns):
-        raise MyException
+        raise GettingDnsInfoError
     dns_of_dname = str(rrset_ns[0])
     return dns_of_dname
 

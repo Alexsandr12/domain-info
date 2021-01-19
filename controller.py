@@ -18,7 +18,16 @@ from sql_handler import (
     check_connect_mariadb,
     get_all_data_mariadb,
 )
-from utilits import encoding_domains, decode_domain, MyException
+from utilits import encoding_domains, decode_domain
+from projectexception import (
+    GeneralError,
+    BdErrors,
+    GettingWhoisTextError,
+    DomainsLimitExceeded,
+    DomainsNotRegistred,
+    GettingHttpInfoError,
+    GettingDnsInfoError,
+)
 from validation import Validation
 from logger import (
     logger_client,
@@ -30,10 +39,10 @@ from logger import (
 )
 
 # TODO в методе get_response_from_method что такое  global response_dname
-# TODO переделать исключения.
 # TODO исправить servise на service
 # TODO убрать проверку подключения бд из модулей
 # TODO исправить mariadb на mysql
+
 
 class ControllerGet:
     """Методы для get запросов"""
@@ -48,18 +57,18 @@ class ControllerGet:
 
         try:
             check_connect_redis()
-        except MyException as err:
+        except BdErrors as err:
             servise_status["status"] = "error"
             servise_status["error"] = err.REDIS_ERROR
 
         try:
             check_connect_mariadb()
-        except MyException as err:
+        except BdErrors as err:
             servise_status["status"] = "error"
             if servise_status.get("error"):
                 servise_status["error"] = err.DB_ERROR
             else:
-                servise_status["error"] = err.MARIADB_BD_ERROR
+                servise_status["error"] = err.MYSQL_ERROR
 
         return servise_status
 
@@ -71,7 +80,7 @@ class ControllerGet:
         """
         try:
             check_connect_redis()
-        except MyException as err:
+        except BdErrors as err:
             return err.REDIS_ERROR
 
         all_cached_domains = []
@@ -92,8 +101,8 @@ class ControllerGet:
         """
         try:
             check_connect_mariadb()
-        except MyException as err:
-            return err.MARIADB_BD_ERROR
+        except BdErrors as err:
+            return err.MYSQL_ERROR
 
         info_from_mariadb = defaultdict(list)
         mariadb_all_data = get_all_data_mariadb()
@@ -154,21 +163,21 @@ class ControllerPost:
         try:
             check_connect_mariadb()
             check_connect_redis()
-        except MyException as err:
+        except GeneralError as err:
             logger_client.exception(
                 f"Запрос клиента: метод: {self.method}, домены: {self.domains}, use_cache: {self.use_cache}. "
-                f"Ответ: {err.GENERAL_ERROR}"
+                f"Ответ: {err.text_err}"
             )
-            return err.GENERAL_ERROR
+            return err.text_err
 
         try:
             domains = self._validation_domains()
-        except MyException as err:
+        except DomainsLimitExceeded as err:
             logger_client.exception(
                 f"Запрос клиента: метод: {self.method}, домены: {self.domains}, use_cache: {self.use_cache}. "
-                f"Ответ: {err.DOMAINS_LIMIT_EXCEEDED}"
+                f"Ответ: {err.text_err}"
             )
-            return err.DOMAINS_LIMIT_EXCEEDED
+            return err.text_err
 
         response = self._collecting_response_from_method(domains["domains_valid"])
         if domains["domains_not_valid"]:
@@ -219,9 +228,9 @@ class ControllerPost:
         """
         response_dname = self.methods_map[self.method](dname)
         self.logger_map[self.method].debug(
-                f"Метод: {self.method}, домен: {dname}, use_cache: {self.use_cache}, "
-                f"return метода : {response_dname}"
-                )
+            f"Метод: {self.method}, домен: {dname}, use_cache: {self.use_cache}, "
+            f"return метода : {response_dname}"
+        )
 
         return response_dname
 
@@ -240,9 +249,9 @@ class ControllerPost:
         if whois_text is None:
             try:
                 whois_text = search_whois_text(dname)
-            except MyException as err:
+            except GettingWhoisTextError as err:
                 rec_method_status_mariadb(dname, "get_whois_text", False)
-                return err.GETTING_WHOIS_TEXT_ERROR
+                return err.text_err
             rec_redis(dname, "get_whois_text", whois_text)
             rec_method_status_mariadb(dname, "get_whois_text", True)
 
@@ -258,13 +267,13 @@ class ControllerPost:
             Union[str, dict]: ошибка получения whois текста/ словарь с пунктами whois и их значениями для домена
         """
         whois_text = self._get_whois_text(dname)
-        if whois_text == MyException.GETTING_WHOIS_TEXT_ERROR:
+        if whois_text == GettingWhoisTextError.text_err:
             return whois_text
         try:
             whois_info = parsing_whois_text(whois_text)
             rec_method_status_mariadb(dname, "get_whois_info", True)
-        except MyException as err:
-            whois_info = err.DOMAIN_NOT_REGISTRED
+        except DomainsNotRegistred as err:
+            whois_info = err.text_err
             rec_method_status_mariadb(dname, "get_whois_info", False)
         return whois_info
 
@@ -299,7 +308,7 @@ class ControllerPost:
             status_code, ssl_verify = search_http_info(dname)
             return f"code: {status_code}, https: {ssl_verify}"
         except requests.exceptions.RequestException:
-            return MyException.GETTING_HTTP_INFO_ERROR
+            return GettingHttpInfoError.text_err
 
     def _rec_http_info_mariadb(self, dname: str, http_info: str):
         """Запись данных в mariadb
@@ -308,7 +317,7 @@ class ControllerPost:
             dname: домен
             http_info: http информация по домену
         """
-        if MyException.GETTING_HTTP_INFO_ERROR in http_info:
+        if GettingHttpInfoError.text_err in http_info:
             rec_method_status_mariadb(dname, "get_http_info", False)
         else:
             rec_method_status_mariadb(dname, "get_http_info", True)
@@ -329,9 +338,9 @@ class ControllerPost:
         if not dns_info:
             try:
                 dns_info = search_dns_records(dname)
-            except MyException as err:
+            except GettingDnsInfoError as err:
                 rec_method_status_mariadb(dname, "get_dns_info", False)
-                return err.GETTING_DNS_INFO_ERROR
+                return err.text_err
         rec_method_status_mariadb(dname, "get_dns_info", True)
         rec_dns_info(dname, "get_dns_info", dns_info)
         return dns_info

@@ -1,5 +1,5 @@
 from config import LIMIT_DOMAINS
-from utilits import MyException
+from projectexception import DomainsLimitExceeded
 import re
 from typing import Dict
 
@@ -22,7 +22,7 @@ class Validation:
     def checking_len_domains(self):
         """Проверка количества доменов"""
         if len(self.domains) > LIMIT_DOMAINS:
-            raise MyException
+            raise DomainsLimitExceeded
 
     def checking_valid_domains(self) -> Dict[str, list]:
         """Разделение валидных и не валидных доменов
