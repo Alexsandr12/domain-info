@@ -37,6 +37,10 @@ from logger import (
 # TODO в методе get_response_from_method что такое  global response_dname
 # TODO изменить название модуля на exceptions
 # TODO TEXT_MASSAGE  в модуле с ошибкой
+# TODO генератор списков
+# TODO logger dict.Config
+# TODO переделать прежнее приложение
+
 
 class ControllerGet:
     """Методы для get запросов"""

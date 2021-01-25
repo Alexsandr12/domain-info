@@ -27,9 +27,7 @@ def check_cache_redis(dname: str, method: str) -> Union[str, None]:
     Return:
         Union[str, None]: данные их кэша редиса или None, если нет данных по передаваемым параметрам
     """
-
-    cache = redis_conn.get(f"{method}:{dname}")
-    if cache:
+    if cache := redis_conn.get(f"{method}:{dname}"):
         return cache.decode("utf-8", "replace")
     return None
 
@@ -55,8 +53,7 @@ def check_dns_info(dname: str, method: str) -> Union[dict, None]:
     Return:
         Union[dict, None]: словать с типами записей и их значениями или None
     """
-    dns_info = redis_conn.hgetall(f"{method}:{dname}")
-    if dns_info:
+    if dns_info := redis_conn.hgetall(f"{method}:{dname}"):
         dns_info_decode = {}
         for type_record, val_record in dns_info.items():
             dns_info_decode[type_record.decode("utf-8", "replace")] = val_record.decode(
@@ -85,11 +82,7 @@ def get_all_key() -> List[str]:
     Return:
         List[str]: список со всеми включами
     """
-    all_key = []
     try:
-        for key in redis_conn.scan_iter():
-            all_key.append(key.decode("utf-8", "replace"))
+        return [key.decode("utf-8", "replace") for key in redis_conn.scan_iter()]
     except redis.exceptions.ConnectionError:
         raise BdErrors
-
-    return all_key
