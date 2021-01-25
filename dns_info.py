@@ -38,9 +38,9 @@ for rdata in answers.response.answer:
 def search_dns_records(dname: str) -> Dict[str, str]:
     """Поиск ресурсных записей для домена с ответственного DNS-сервера
 
-    :param
+    Args:
         dname: домен
-    :return:
+    Return:
         Dict[str, str]: словать с типами записей и их значениями
     """
     records_of_dname = {}
@@ -60,10 +60,10 @@ def search_dns_records(dname: str) -> Dict[str, str]:
 def get_ip_of_dns(dname: str) -> str:
     """Получение IP адреса DNS сервера домена
 
-    :param
+    Args:
         dname: домен
 
-    :return:
+    Return:
         str: ip адрес DNS сервера домена
     """
     dns_of_dname = get_dns_of_dname(dname)
@@ -75,9 +75,9 @@ def get_ip_of_dns(dname: str) -> str:
 def get_dns_of_dname(dname: str) -> str:
     """Получение DNS-сервера домена c ответственного dns зоны
 
-    :param
+    Args:
         dname: домен
-    :return:
+    Return:
         str: DNS-сервер домена
     """
     query = dns.message.make_query(
@@ -96,9 +96,9 @@ def get_dns_of_dname(dname: str) -> str:
 def parsing_values_record(response: str) -> List[str]:
     """Парсинг значений ресурсной записи
 
-    :param
+    Args:
         response: значения ресурсной записи
-    :return:
+    Return:
         List[str]: список значений ресурсной записи
     """
     values_record = []

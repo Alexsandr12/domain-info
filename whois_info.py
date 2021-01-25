@@ -36,10 +36,10 @@ def search_whois_text(dname: str) -> str:
 def parsing_whois_text(whois_text: str) -> Dict[str, str]:
     """Парсинг whois текста
 
-    :param
+    Args:
         whois_text: whois текст
 
-    :return:
+    Return:
         Dict[str, str]: словарь с полями whois и их значениями
     """
     if "created" not in whois_text:

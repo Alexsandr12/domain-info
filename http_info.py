@@ -7,10 +7,10 @@ from config import REQTIMEOUT
 def search_http_info(dname: str) -> Tuple[int, str]:
     """Запрос http информации для домена
 
-    :param
+    Args:
         dname: домен
 
-    :return:
+    Return:
         Tuple[int, str]: списков со значением статус кода http запроса и статусом проверки SSL
     """
     try:

@@ -30,9 +30,9 @@ def get_whois_text() -> str:
 def get_whois_info() -> str:
     """Route запроса инфы из controller по передаваемым параметрам
 
-        :return:
-            str: ответ за запрос
-        """
+    Return:
+        str: ответ за запрос
+    """
     domains = request.json["domain"]
     use_cache = request.json["use_cache"]
     whois_info_dnames = ControllerPost(
@@ -46,7 +46,7 @@ def get_whois_info() -> str:
 def get_http_info() -> str:
     """Route запроса инфы из controller по передаваемым параметрам
 
-    :return:
+    Return:
         str: ответ за запрос
     """
     domains = request.json["domain"]
@@ -62,7 +62,7 @@ def get_http_info() -> str:
 def get_dns_info() -> str:
     """Route запроса инфы из controller по передаваемым параметрам
 
-    :return:
+    Return:
         str: ответ за запрос
     """
     domains = request.json["domain"]
@@ -78,7 +78,7 @@ def get_dns_info() -> str:
 def get_all_info() -> str:
     """Route запроса инфы из controller по передаваемым параметрам
 
-    :return:
+    Return:
         str: ответ за запрос
     """
     domains = request.json["domain"]
@@ -94,7 +94,7 @@ def get_all_info() -> str:
 def get_service_status() -> str:
     """Запрос статуса подключения к базам данных
 
-    :return:
+    Return:
         str: результат запроса
     """
     service_status = ControllerGet().check_connect_db()
@@ -106,7 +106,7 @@ def get_service_status() -> str:
 def get_all_cached_domains() -> str:
     """Запрос всех закэшированных доменов из redis
 
-    :return:
+    Return:
         str: результат запроса
     """
     all_domains = ControllerGet().get_all_cached_domains()
@@ -118,7 +118,7 @@ def get_all_cached_domains() -> str:
 def get_info_from_sql() -> str:
     """Запрос всей информации из mariadb
 
-    :return:
+    Return:
         str: результат запроса
     """
     info_from_sql = ControllerGet().get_info_from_sql()

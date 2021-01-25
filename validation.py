@@ -4,17 +4,12 @@ import re
 from typing import Dict
 
 
-# TODO доделать валидацию, проверка всех допустимых символов
-
-
 class Validation:
     """Валидация и проверка колличества доменом"""
 
     def __init__(self, domains: list):
         """
         Args:
-            domains: список доменов
-        Attributes:
             domains: список доменов
         """
         self.domains = domains
@@ -27,7 +22,7 @@ class Validation:
     def checking_valid_domains(self) -> Dict[str, list]:
         """Разделение валидных и не валидных доменов
 
-        :return:
+        Return:
             Dict[str, list]: словарь валидными и не валидными доменами
         """
         domains = {"domains_valid": [], "domains_not_valid": []}

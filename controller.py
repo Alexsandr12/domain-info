@@ -43,7 +43,7 @@ class ControllerGet:
     def check_connect_db(self) -> Dict[str, str]:
         """Получение и формирование инфы о статусе подключения от баз данных
 
-        :return:
+        Return:
             dict: словарь со статусом соединения и ошибкой, если она имеется
         """
         service_status = {"status": "successful"}
@@ -68,7 +68,7 @@ class ControllerGet:
     def get_all_cached_domains(self) -> Union[str, List[str]]:
         """Получение всех закэшированных доменов из redis
 
-        :return:
+        Return:
             Union[str, List[str]]: сообщение о ошибке соединения с базой данных или список с доменами
         """
         all_cached_domains = []
@@ -87,7 +87,7 @@ class ControllerGet:
     def get_info_from_sql(self) -> Union[str, Dict[str, list]]:
         """Получение всей информации из mariadb
 
-        :return:
+        Return:
             Union[str, Dict[str:list]]: сообщение о ошибке соединения с базой данных или словарь с доменами и списками
             записей из db для домена
         """
@@ -147,7 +147,7 @@ class ControllerPost:
         """Основной модуль, проверяет подключение к бд и валидацию доменов,
         если ошибки нет, собирает ответ для клиента
 
-        :return:
+        Return:
             Union[str, str, dict]: ошибка подключения к базам данных/ошибка колличества передаваемых доменов/
             словарь с валидными доменами и ответом методов, и невалидными доменами
         """
@@ -183,7 +183,7 @@ class ControllerPost:
     def _validation_domains(self) -> Dict[str, list]:
         """Вызов методов для проверки валидации доменов
 
-        :return:
+        Return:
             dict: словарь с валидными и не валидными доменами
         """
         validator = Validation(self.domains_puny)
@@ -193,10 +193,10 @@ class ControllerPost:
     def _collecting_response_from_method(self, domains: list) -> dict:
         """Сбор ответов от методов для доменов
 
-        :param
+        Args:
             domains: список доменов
 
-        :return:
+        Return:
             dict: словарь с доменами и ответом методов
         """
         response = {}
@@ -210,10 +210,10 @@ class ControllerPost:
     def _get_response_from_method(self, dname: str) -> Union[str, dict]:
         """Ответ от методов для домена
 
-        :param
+        Args:
             dname: домен
 
-        :return:
+        Return:
             Union[str, dict]: ответ от методов get_whois_text, get_http_info/
             ответы от методов get_whois_info, get_dns_info, get_all_info
         """
@@ -228,10 +228,10 @@ class ControllerPost:
     def _get_whois_text(self, dname: str) -> str:
         """Запрос whois текста для домена из кэша или из функции
 
-        :param
+        Args:
             dname: домен
 
-        :return:
+        Return:
             str: ошибка функции получения whois текста/ whois текст из кэша или ответ от функции
         """
         whois_text = None
@@ -251,10 +251,10 @@ class ControllerPost:
     def _get_whois_info(self, dname: str) -> Union[str, dict]:
         """Запрос whois информации для домена
 
-        :param
+        Args:
             dname: домен
 
-        :return:
+        Return:
             Union[str, dict]: ошибка получения whois текста/ словарь с пунктами whois и их значениями для домена
         """
         whois_text = self._get_whois_text(dname)
@@ -271,10 +271,10 @@ class ControllerPost:
     def _get_http_info(self, dname: str) -> str:
         """Запрос http инфо по домену в кэше, если нет то в функции
 
-        :param
+        Args:
             dname: домен
 
-        :return:
+        Return:
             str: http инфо из кэша или ответ от функции
         """
         http_info = None
@@ -289,10 +289,10 @@ class ControllerPost:
     def _forming_response_http_info(self, dname: str) -> Union[str, str]:
         """Формулировка ответа от функции поиска http информации
 
-        :param
+        Args:
             dname: домен
 
-        :return:
+        Return:
             Union[str, str]: ответ от функции/ ошибка поиска http информации
         """
         try:
@@ -304,7 +304,7 @@ class ControllerPost:
     def _rec_http_info_sql(self, dname: str, http_info: str):
         """Запись данных в mariadb
 
-        :param
+        Args:
             dname: домен
             http_info: http информация по домену
         """
@@ -316,10 +316,10 @@ class ControllerPost:
     def _get_dns_info(self, dname: str) -> Union[str, dict]:
         """Запрос dns записей для домена из кэша или из функции
 
-        :param
+        Args:
             dname:домен
 
-        :return:
+        Return:
             Union[str, dict]: ошибка функции поиска dns записей для домена/
             словать с типами ресурсных записей и их значениями для доменов
         """
@@ -339,10 +339,10 @@ class ControllerPost:
     def _get_all_info_domains(self, dname: str) -> dict:
         """Сбор информации для домена из всех post методов
 
-        :param
+        Args
             dname: домен
 
-        :return:
+        Return:
             dict: словарь с методами и из ответами
         """
         all_info = {}

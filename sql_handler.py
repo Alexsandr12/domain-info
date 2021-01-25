@@ -21,12 +21,12 @@ PRIMARY KEY (id)
 )
 """
 
-"""try:
+try:
     method_cursor.execute(create_table_data)
     method_conn.commit()
-    #print("Таблица создана")
+    # print("Таблица создана")
 except Error as e:
-    print(e)"""
+    print(e)
 
 
 def check_connect_sql():
@@ -40,7 +40,7 @@ def check_connect_sql():
 def rec_method_status_sql(dname: str, method: str, success_value: bool):
     """Запись информцаии о статусе выполнения метода
 
-    :param
+    Args:
         dname: домен
         method: название метода
         success_value: статус выполнения метода
@@ -55,7 +55,7 @@ def rec_method_status_sql(dname: str, method: str, success_value: bool):
 def get_all_data_sql() -> List[tuple]:
     """Получение всех данных из таблицы used_methods
 
-    :return:
+    Return:
         List[tuple]: список со всеми строками таблицы
     """
     query = f"SELECT * FROM used_methods"

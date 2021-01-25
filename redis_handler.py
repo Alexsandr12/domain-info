@@ -20,11 +20,11 @@ def check_connect_redis():
 def check_cache_redis(dname: str, method: str) -> Union[str, None]:
     """Запрос данных их кэша по параметрам
 
-    :param
+    Args:
         dname: домен
         method: название метода
 
-    :return:
+    Return:
         Union[str, None]: данные их кэша редиса или None, если нет данных по передаваемым параметрам
     """
 
@@ -37,7 +37,7 @@ def check_cache_redis(dname: str, method: str) -> Union[str, None]:
 def rec_redis(dname: str, method: str, info: str):
     """Запись передаваемых данных
 
-    :param
+    Args:
         dname: домен
         method: название метода
         info: передаваемые данные
@@ -48,11 +48,11 @@ def rec_redis(dname: str, method: str, info: str):
 def check_dns_info(dname: str, method: str) -> Union[dict, None]:
     """Запрос из кэша dns-info по домену
 
-    :param
+    Args:
         dname: домен
         method: название метода
 
-    :return:
+    Return:
         Union[dict, None]: словать с типами записей и их значениями или None
     """
     dns_info = redis_conn.hgetall(f"{method}:{dname}")
@@ -69,7 +69,7 @@ def check_dns_info(dname: str, method: str) -> Union[dict, None]:
 def rec_dns_info(dname: str, method: str, dns_info: dict):
     """Запись dns-info домена
 
-    :param
+    Args:
         dname: домен
         method: название метода
         dns_info: ресурсные записи и их значения
@@ -82,7 +82,7 @@ def rec_dns_info(dname: str, method: str, dns_info: dict):
 def get_all_key() -> List[str]:
     """Запрос всех ключей их кэша
 
-    :return:
+    Return:
         List[str]: список со всеми включами
     """
     all_key = []
