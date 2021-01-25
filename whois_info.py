@@ -44,15 +44,18 @@ def parsing_whois_text(whois_text: str) -> Dict[str, str]:
     """
     if "created" not in whois_text:
         raise DomainsNotRegistred
+
     whois_text = whois_text.split("\n")
     whois_info = {}
     number_server = 0
     interested_info_whois_text = whois_text[5:-5]
+
     for whois_string in interested_info_whois_text:
-        whois_string = whois_string.split(":", maxsplit=1)
-        if whois_string[0] != "nserver":
-            whois_info[whois_string[0]] = whois_string[1].strip()
-        else:
+        key, value = whois_string.split(":", maxsplit=1)
+        if key == "nserver":
             number_server += 1
-            whois_info[f"nserver {number_server}"] = whois_string[1].strip()
+            whois_info[f"nserver {number_server}"] = value.strip()
+        else:
+            whois_info[key] = value.strip()
+
     return whois_info

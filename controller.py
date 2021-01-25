@@ -35,7 +35,8 @@ from logger import (
 )
 
 # TODO в методе get_response_from_method что такое  global response_dname
-
+# TODO изменить название модуля на exceptions
+# TODO TEXT_MASSAGE  в модуле с ошибкой
 
 class ControllerGet:
     """Методы для get запросов"""
@@ -308,7 +309,7 @@ class ControllerPost:
             dname: домен
             http_info: http информация по домену
         """
-        if GettingHttpInfoError.text_err in http_info:
+        if GettingHttpInfoError.text_err == http_info:
             rec_method_status_sql(dname, "get_http_info", False)
         else:
             rec_method_status_sql(dname, "get_http_info", True)
@@ -345,9 +346,9 @@ class ControllerPost:
         Return:
             dict: словарь с методами и из ответами
         """
-        all_info = {}
-        all_info["whois_text"] = self._get_whois_text(dname)
-        all_info["whois_info"] = self._get_whois_info(dname)
-        all_info["http_info"] = self._get_http_info(dname)
-        all_info["dns_info"] = self._get_dns_info(dname)
-        return all_info
+        return {
+            "whois_text": self._get_whois_text(dname),
+            "whois_info": self._get_whois_info(dname),
+            "http_info": self._get_http_info(dname),
+            "dns_info": self._get_dns_info(dname)
+        }

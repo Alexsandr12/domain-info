@@ -35,13 +35,13 @@ for rdata in answers.response.answer:
 # TODO посмотреть с Женьком принты, как упростить или сделать понятнее получение данных из rrset
 
 
-def search_dns_records(dname: str) -> Dict[str, str]:
+def search_dns_records(dname: str) -> Dict[str, list]:
     """Поиск ресурсных записей для домена с ответственного DNS-сервера
 
     Args:
         dname: домен
     Return:
-        Dict[str, str]: словать с типами записей и их значениями
+        Dict[str, list]: словать с типами записей и их значениями
     """
     records_of_dname = {}
     ip_nserver = get_ip_of_dns(dname)
@@ -52,7 +52,7 @@ def search_dns_records(dname: str) -> Dict[str, str]:
         response = dns.query.udp(query, ip_nserver, timeout=DNS_TIMEOUT)
         values_record = parsing_values_record(response)
         records_of_dname[type_record] = values_record
-    if records_of_dname["NS"] is None:
+    if records_of_dname["NS"]:
         raise GettingDnsInfoError
     return records_of_dname
 
@@ -102,9 +102,8 @@ def parsing_values_record(response: str) -> List[str]:
         List[str]: список значений ресурсной записи
     """
     values_record = []
-    if not response.answer:
-        values_record = None
-    else:
+    if response.answer:
+        # TODO вынести с отдельну переменную response.answer[0]
         for answer in response.answer[0]:
             answer = str(answer).strip('"')
             values_record.append(answer)
