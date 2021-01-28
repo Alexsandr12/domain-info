@@ -38,13 +38,14 @@ from logger import (
 
 # TODO генератор списков
 # TODO переделать прежнее приложение
+# TODO 223 строка, отменен dname
 
 
 class ControllerGet:
     """Методы для get запросов"""
 
     def check_connect_db(self) -> Dict[str, str]:
-        """Получение и формирование инфы о статусе подключения от баз данных
+        """Получение и формирование инфы о статусе подключения к базам данных
 
         Return:
             dict: словарь со статусом соединения и ошибкой, если она имеется
@@ -88,11 +89,11 @@ class ControllerGet:
         return list(set(all_cached_domains))
 
     def get_info_from_sql(self) -> Union[str, Dict[str, list]]:
-        """Получение всей информации из mariadb
+        """Получение всей информации из sql
 
         Return:
             Union[str, Dict[str:list]]: сообщение о ошибке соединения с базой данных или словарь с доменами и списками
-            записей из db для домена
+            записей из sql для домена
         """
         info_from_sql = defaultdict(list)
         try:
@@ -146,12 +147,12 @@ class ControllerPost:
             "get_all_info": logger_get_all_info,
         }
 
-    def forming_response(self) -> Union[str, str, dict]:
-        """Основной модуль, проверяет подключение к бд и валидацию доменов,
-        если ошибки нет, собирает ответ для клиента
+    def forming_response(self) -> Union[str, dict]:
+        """Основной модуль, проверка подключения к бд, валидацию доменов,
+         сбор инфы для доменов из методов
 
         Return:
-            Union[str, str, dict]: ошибка подключения к базам данных/ошибка колличества передаваемых доменов/
+            Union[str, dict]: ошибка подключения к базам данных/ошибка колличества передаваемых доменов/
             словарь с валидными доменами и ответом методов, и невалидными доменами
         """
         try:
@@ -211,14 +212,13 @@ class ControllerPost:
         return response
 
     def _get_response_from_method(self, dname: str) -> Union[str, dict]:
-        """Ответ от методов для домена
+        """Получение инфы из методов для домена
 
         Args:
             dname: домен
 
         Return:
-            Union[str, dict]: ответ от методов get_whois_text, get_http_info/
-            ответы от методов get_whois_info, get_dns_info, get_all_info
+            Union[str, dict]: ответ от методов
         """
         response_dname = self.methods_map[self.method](dname)
         self.logger_map[self.method].debug(
@@ -229,13 +229,13 @@ class ControllerPost:
         return response_dname
 
     def _get_whois_text(self, dname: str) -> str:
-        """Запрос whois текста для домена из кэша или из функции
+        """Получение whois text для домена
 
         Args:
             dname: домен
 
         Return:
-            str: ошибка функции получения whois текста/ whois текст из кэша или ответ от функции
+            str: ошибка получения whois текста/ whois text домена
         """
         whois_text = None
         if self.use_cache:
@@ -252,7 +252,7 @@ class ControllerPost:
         return whois_text
 
     def _get_whois_info(self, dname: str) -> Union[str, dict]:
-        """Запрос whois информации для домена
+        """Получение whois info для домена
 
         Args:
             dname: домен
@@ -272,40 +272,31 @@ class ControllerPost:
         return whois_info
 
     def _get_http_info(self, dname: str) -> str:
-        """Запрос http инфо по домену в кэше, если нет то в функции
+        """Получение http инфо по домену
 
         Args:
             dname: домен
 
         Return:
-            str: http инфо из кэша или ответ от функции
+            str: ошибка получения http инфо/ http инфо домена
         """
         http_info = None
         if self.use_cache:
             http_info = check_cache_redis(dname, "get_http_info")
+
         if http_info is None:
-            http_info = self._forming_response_http_info(dname)
+            try:
+                status_code, ssl_verify = search_http_info(dname)
+                http_info = f"code: {status_code}, https: {ssl_verify}"
+            except requests.exceptions.RequestException:
+                http_info = GettingHttpInfoError.TEXT_MESSAGE
             rec_redis(dname, "get_http_info", http_info)
         self._rec_http_info_sql(dname, http_info)
+
         return http_info
 
-    def _forming_response_http_info(self, dname: str) -> Union[str, str]:
-        """Формулировка ответа от функции поиска http информации
-
-        Args:
-            dname: домен
-
-        Return:
-            Union[str, str]: ответ от функции/ ошибка поиска http информации
-        """
-        try:
-            status_code, ssl_verify = search_http_info(dname)
-            return f"code: {status_code}, https: {ssl_verify}"
-        except requests.exceptions.RequestException:
-            return GettingHttpInfoError.TEXT_MESSAGE
-
     def _rec_http_info_sql(self, dname: str, http_info: str):
-        """Запись данных в mariadb
+        """Запись данных в sql
 
         Args:
             dname: домен
@@ -317,14 +308,14 @@ class ControllerPost:
             rec_method_status_sql(dname, "get_http_info", True)
 
     def _get_dns_info(self, dname: str) -> Union[str, dict]:
-        """Запрос dns записей для домена из кэша или из функции
+        """Получение dns info для домена
 
         Args:
             dname:домен
 
         Return:
-            Union[str, dict]: ошибка функции поиска dns записей для домена/
-            словать с типами ресурсных записей и их значениями для доменов
+            Union[str, dict]: ошибка получения dns info/
+            словать с типами ресурсных записей и их значениями для домена
         """
         dns_info = None
         if self.use_cache == "True":
@@ -346,7 +337,7 @@ class ControllerPost:
             dname: домен
 
         Return:
-            dict: словарь с методами и из ответами
+            dict: словарь с названием метода и его ответом
         """
         return {
             "whois_text": self._get_whois_text(dname),

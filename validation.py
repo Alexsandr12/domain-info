@@ -24,7 +24,7 @@ class Validation:
             raise DomainsLimitExceeded
 
     def checking_valid_domains(self) -> Dict[str, list]:
-        """Разделение валидных и не валидных доменов
+        """Валидация доменов
 
         Return:
             Dict[str, list]: словарь валидными и не валидными доменами

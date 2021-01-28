@@ -6,10 +6,8 @@ from exceptions import RedisError
 
 redis_conn = redis.Redis()
 
-# TODO decode для dns_info, чтобы выводились списки, а не строки с записями
 
-
-def check_connect_redis():
+def check_connect_redis() -> None:
     """Проверка доступа к redis"""
     try:
         redis_conn.ping()
@@ -18,14 +16,14 @@ def check_connect_redis():
 
 
 def check_cache_redis(dname: str, method: str) -> Union[str, None]:
-    """Запрос данных их кэша по параметрам
+    """Запрос данных по методу для домена
 
     Args:
         dname: домен
         method: название метода
 
     Return:
-        Union[str, None]: данные их кэша редиса или None, если нет данных по передаваемым параметрам
+        Union[str, None]: данные по методу или None.
     """
     if cache := redis_conn.get(f"{method}:{dname}"):
         return cache.decode("utf-8", "replace")
@@ -51,7 +49,7 @@ def check_dns_info(dname: str, method: str) -> Union[dict, None]:
         method: название метода
 
     Return:
-        Union[dict, None]: словать с типами записей и их значениями или None
+        Union[dict, None]: словать с типами записей и их значениями / None
     """
     if dns_info := redis_conn.hgetall(f"{method}:{dname}"):
         dns_info_decode = {}

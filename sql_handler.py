@@ -29,7 +29,7 @@ except Error as e:
     print(e)"""
 
 
-def check_connect_sql():
+def check_connect_sql() -> None:
     """Проверка подключения к mariadb"""
     try:
         method_conn.ping()
@@ -53,7 +53,7 @@ def rec_method_status_sql(dname: str, method: str, success_value: bool):
 
 
 def get_all_data_sql() -> List[tuple]:
-    """Получение всех данных из таблицы used_methods
+    """Получение всех данных из sql
 
     Return:
         List[tuple]: список со всеми строками таблицы

@@ -11,7 +11,7 @@ def search_http_info(dname: str) -> Tuple[int, str]:
         dname: домен
 
     Return:
-        Tuple[int, str]: списков со значением статус кода http запроса и статусом проверки SSL
+        Tuple[int, str]: кортеж со значением статус кода http запроса и статусом проверки SSL
     """
     try:
         response = requests.get(f"https://{dname}", verify=True, timeout=REQTIMEOUT)

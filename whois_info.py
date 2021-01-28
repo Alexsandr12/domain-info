@@ -40,7 +40,7 @@ def parsing_whois_text(whois_text: str) -> Dict[str, str]:
         whois_text: whois текст
 
     Return:
-        Dict[str, str]: словарь с полями whois и их значениями
+        Dict[str, str]: словарь с пунктами whois и их значениями
     """
     if "created" not in whois_text:
         raise DomainsNotRegistred
@@ -51,11 +51,11 @@ def parsing_whois_text(whois_text: str) -> Dict[str, str]:
     interested_info_whois_text = whois_text[5:-5]
 
     for whois_string in interested_info_whois_text:
-        key, value = whois_string.split(":", maxsplit=1)
-        if key == "nserver":
+        point_whois, point_value = whois_string.split(":", maxsplit=1)
+        if point_whois == "nserver":
             number_server += 1
-            whois_info[f"nserver {number_server}"] = value.strip()
+            whois_info[f"nserver {number_server}"] = point_value.strip()
         else:
-            whois_info[key] = value.strip()
+            whois_info[point_whois] = point_value.strip()
 
     return whois_info

@@ -15,7 +15,7 @@ def get_whois_text() -> str:
     """Получене whois текста для доменов
 
     Return:
-        str: json с доменами и whois текстом
+        str: whois текст доменов
     """
     domains = request.json["domain"]
     use_cache = request.json["use_cache"]
@@ -28,10 +28,10 @@ def get_whois_text() -> str:
 
 @app.route("/get_whois_info", methods=["POST"])
 def get_whois_info() -> str:
-    """Route запроса инфы из controller по передаваемым параметрам
+    """Получение whois info для доменов
 
     Return:
-        str: ответ за запрос
+        str: whois info доменов
     """
     domains = request.json["domain"]
     use_cache = request.json["use_cache"]
@@ -44,10 +44,10 @@ def get_whois_info() -> str:
 
 @app.route("/get_http_info", methods=["POST"])
 def get_http_info() -> str:
-    """Route запроса инфы из controller по передаваемым параметрам
+    """Получение http info для доменов
 
     Return:
-        str: ответ за запрос
+        str: http info доменов
     """
     domains = request.json["domain"]
     use_cache = request.json["use_cache"]
@@ -60,10 +60,10 @@ def get_http_info() -> str:
 
 @app.route("/get_dns_info", methods=["POST"])
 def get_dns_info() -> str:
-    """Route запроса инфы из controller по передаваемым параметрам
+    """Получение dns info для доменов
 
     Return:
-        str: ответ за запрос
+        str: dns info доменов
     """
     domains = request.json["domain"]
     use_cache = request.json["use_cache"]
@@ -76,10 +76,10 @@ def get_dns_info() -> str:
 
 @app.route("/get_all_info", methods=["POST"])
 def get_all_info() -> str:
-    """Route запроса инфы из controller по передаваемым параметрам
+    """Получение всей инфы из post методов для доменов
 
     Return:
-        str: ответ за запрос
+        str: вся собранная информация о доменах из post методов
     """
     domains = request.json["domain"]
     use_cache = request.json["use_cache"]
@@ -116,7 +116,7 @@ def get_all_cached_domains() -> str:
 
 @app.route("/get_info_from_sql", methods=["GET"])
 def get_info_from_sql() -> str:
-    """Запрос всей информации из mariadb
+    """Запрос всей информации из sql
 
     Return:
         str: результат запроса

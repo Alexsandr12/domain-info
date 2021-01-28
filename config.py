@@ -1,28 +1,28 @@
-"""web.py"""
+"""web"""
 INDENT = 4
 ENSURE_ASCII = False
 
-"""whois_info.py"""
+"""whois info"""
 WHOIS_TIMEOUT = 3
 PORT = 43
 WHOIS_SERVER = "whois.tcinet.ru"
 
-"""redis_handler.py"""
+"""redis"""
 EXPIRED_RECORD = 3600
 
-"""http_info.py"""
+"""http info"""
 REQTIMEOUT = 5
 
-"""dns_info.py"""
+"""dns info"""
 TYPE_RECORDS = {"A", "AAAA", "NS", "TXT", "MX", "CNAME"}
 PAYLOAD = 4096
 DNS_TIMEOUT = 5
 IP_ROOT_DNS = "193.232.128.6"
 
-"""validation.py"""
+"""validation"""
 LIMIT_DOMAINS = 5
 
-"""sql_handler.py"""
+"""sql"""
 HOST = "localhost"
 USER = "alexandr"
 PASSWORD = "1"
