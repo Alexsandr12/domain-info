@@ -17,7 +17,9 @@ from sql_handler import rec_method_status_sql, check_connect_sql, get_all_data_s
 from utilits import encoding_domains, decode_domain
 from exceptions import (
     GeneralError,
-    BdErrors,
+    DbError,
+    RedisError,
+    MySqlError,
     GettingWhoisTextError,
     DomainsLimitExceeded,
     DomainsNotRegistred,
@@ -34,11 +36,7 @@ from logger import (
     logger_get_whois_text,
 )
 
-# TODO в методе get_response_from_method что такое  global response_dname
-# TODO изменить название модуля на exceptions
-# TODO TEXT_MASSAGE  в модуле с ошибкой
 # TODO генератор списков
-# TODO logger dict.Config
 # TODO переделать прежнее приложение
 
 
@@ -55,18 +53,18 @@ class ControllerGet:
 
         try:
             check_connect_redis()
-        except BdErrors as err:
+        except RedisError as err:
             service_status["status"] = "error"
-            service_status["error"] = err.REDIS_ERROR
+            service_status["error"] = err.TEXT_MESSAGE
 
         try:
             check_connect_sql()
-        except BdErrors as err:
+        except MySqlError as err:
             service_status["status"] = "error"
             if service_status.get("error"):
-                service_status["error"] = err.DB_ERROR
+                service_status["error"] = DbError.TEXT_MESSAGE
             else:
-                service_status["error"] = err.MYSQL_ERROR
+                service_status["error"] = err.TEXT_MESSAGE
 
         return service_status
 
@@ -79,8 +77,8 @@ class ControllerGet:
         all_cached_domains = []
         try:
             all_key_redis = get_all_key()
-        except BdErrors as err:
-            return err.REDIS_ERROR
+        except RedisError as err:
+            return err.TEXT_MESSAGE
 
         for key in all_key_redis:
             key = key.split(":")
@@ -99,8 +97,8 @@ class ControllerGet:
         info_from_sql = defaultdict(list)
         try:
             sql_all_data = get_all_data_sql()
-        except BdErrors as err:
-            return err.MYSQL_ERROR
+        except MySqlError as err:
+            return err.TEXT_MESSAGE
 
         for sql_record in sql_all_data:
             sql_record = list(sql_record)
@@ -162,18 +160,18 @@ class ControllerPost:
         except GeneralError as err:
             logger_client.exception(
                 f"Запрос клиента: метод: {self.method}, домены: {self.domains}, use_cache: {self.use_cache}. "
-                f"Ответ: {err.text_err}"
+                f"Ответ: {err.TEXT_MESSAGE}"
             )
-            return err.text_err
+            return err.TEXT_MESSAGE
 
         try:
             domains = self._validation_domains()
         except DomainsLimitExceeded as err:
             logger_client.exception(
                 f"Запрос клиента: метод: {self.method}, домены: {self.domains}, use_cache: {self.use_cache}. "
-                f"Ответ: {err.text_err}"
+                f"Ответ: {err.TEXT_MESSAGE}"
             )
-            return err.text_err
+            return err.TEXT_MESSAGE
 
         response = self._collecting_response_from_method(domains["domains_valid"])
         if domains["domains_not_valid"]:
@@ -247,7 +245,7 @@ class ControllerPost:
                 whois_text = search_whois_text(dname)
             except GettingWhoisTextError as err:
                 rec_method_status_sql(dname, "get_whois_text", False)
-                return err.text_err
+                return err.TEXT_MESSAGE
             rec_redis(dname, "get_whois_text", whois_text)
             rec_method_status_sql(dname, "get_whois_text", True)
 
@@ -263,13 +261,13 @@ class ControllerPost:
             Union[str, dict]: ошибка получения whois текста/ словарь с пунктами whois и их значениями для домена
         """
         whois_text = self._get_whois_text(dname)
-        if whois_text == GettingWhoisTextError.text_err:
+        if whois_text == GettingWhoisTextError.TEXT_MESSAGE:
             return whois_text
         try:
             whois_info = parsing_whois_text(whois_text)
             rec_method_status_sql(dname, "get_whois_info", True)
         except DomainsNotRegistred as err:
-            whois_info = err.text_err
+            whois_info = err.TEXT_MESSAGE
             rec_method_status_sql(dname, "get_whois_info", False)
         return whois_info
 
@@ -304,7 +302,7 @@ class ControllerPost:
             status_code, ssl_verify = search_http_info(dname)
             return f"code: {status_code}, https: {ssl_verify}"
         except requests.exceptions.RequestException:
-            return GettingHttpInfoError.text_err
+            return GettingHttpInfoError.TEXT_MESSAGE
 
     def _rec_http_info_sql(self, dname: str, http_info: str):
         """Запись данных в mariadb
@@ -313,7 +311,7 @@ class ControllerPost:
             dname: домен
             http_info: http информация по домену
         """
-        if GettingHttpInfoError.text_err == http_info:
+        if GettingHttpInfoError.TEXT_MESSAGE == http_info:
             rec_method_status_sql(dname, "get_http_info", False)
         else:
             rec_method_status_sql(dname, "get_http_info", True)
@@ -336,7 +334,7 @@ class ControllerPost:
                 dns_info = search_dns_records(dname)
             except GettingDnsInfoError as err:
                 rec_method_status_sql(dname, "get_dns_info", False)
-                return err.text_err
+                return err.TEXT_MESSAGE
         rec_method_status_sql(dname, "get_dns_info", True)
         rec_dns_info(dname, "get_dns_info", dns_info)
         return dns_info

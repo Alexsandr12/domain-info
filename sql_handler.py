@@ -2,7 +2,7 @@ import mysql.connector
 from mysql.connector import Error
 from typing import List
 
-from exceptions import BdErrors
+from exceptions import MySqlError
 from config import HOST, USER, PASSWORD, DATABASE
 
 method_conn = mysql.connector.connect(
@@ -34,7 +34,7 @@ def check_connect_sql():
     try:
         method_conn.ping()
     except mysql.connector.errors.InterfaceError:
-        raise BdErrors
+        raise MySqlError
 
 
 def rec_method_status_sql(dname: str, method: str, success_value: bool):
@@ -63,6 +63,6 @@ def get_all_data_sql() -> List[tuple]:
     try:
         method_cursor.execute(query)
     except mysql.connector.errors.DatabaseError:
-        raise BdErrors
+        raise MySqlError
 
     return method_cursor.fetchall()

@@ -3,7 +3,6 @@ from typing import List, Dict
 import dns.name
 import dns.message
 import dns.query
-import dns.flags
 import dns.resolver
 
 from exceptions import GettingDnsInfoError
@@ -93,7 +92,7 @@ def get_dns_of_dname(dname: str) -> str:
     return dns_of_dname
 
 
-def parsing_values_record(response: str) -> List[str]:
+def parsing_values_record(response: dns.message.QueryMessage) -> List[str]:
     """Парсинг значений ресурсной записи
 
     Args:
@@ -101,10 +100,10 @@ def parsing_values_record(response: str) -> List[str]:
     Return:
         List[str]: список значений ресурсной записи
     """
-    values_record = []
+    valid_values_record = []
     if response.answer:
-        # TODO вынести с отдельну переменную response.answer[0]
-        for answer in response.answer[0]:
+        not_valid_values_record = response.answer[0]
+        for answer in not_valid_values_record:
             answer = str(answer).strip('"')
-            values_record.append(answer)
-    return values_record
+            valid_values_record.append(answer)
+    return valid_values_record

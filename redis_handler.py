@@ -2,7 +2,7 @@ import redis
 from typing import Union, List
 
 from config import EXPIRED_RECORD
-from exceptions import BdErrors
+from exceptions import RedisError
 
 redis_conn = redis.Redis()
 
@@ -14,7 +14,7 @@ def check_connect_redis():
     try:
         redis_conn.ping()
     except redis.exceptions.ConnectionError:
-        raise BdErrors
+        raise RedisError
 
 
 def check_cache_redis(dname: str, method: str) -> Union[str, None]:
@@ -85,4 +85,4 @@ def get_all_key() -> List[str]:
     try:
         return [key.decode("utf-8", "replace") for key in redis_conn.scan_iter()]
     except redis.exceptions.ConnectionError:
-        raise BdErrors
+        raise RedisError
