@@ -15,7 +15,7 @@ from redis_handler import (
 )
 from sql_handler import rec_method_status_sql, check_connect_sql, get_all_data_sql
 from utilits import encoding_domains, decode_domain
-from projectexception import (
+from exceptions import (
     GeneralError,
     BdErrors,
     GettingWhoisTextError,
@@ -354,5 +354,5 @@ class ControllerPost:
             "whois_text": self._get_whois_text(dname),
             "whois_info": self._get_whois_info(dname),
             "http_info": self._get_http_info(dname),
-            "dns_info": self._get_dns_info(dname)
+            "dns_info": self._get_dns_info(dname),
         }

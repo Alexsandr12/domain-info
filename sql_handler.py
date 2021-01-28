@@ -2,7 +2,7 @@ import mysql.connector
 from mysql.connector import Error
 from typing import List
 
-from projectexception import BdErrors
+from exceptions import BdErrors
 from config import HOST, USER, PASSWORD, DATABASE
 
 method_conn = mysql.connector.connect(

@@ -2,7 +2,7 @@ import redis
 from typing import Union, List
 
 from config import EXPIRED_RECORD
-from projectexception import BdErrors
+from exceptions import BdErrors
 
 redis_conn = redis.Redis()
 

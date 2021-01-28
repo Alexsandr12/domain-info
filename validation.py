@@ -2,7 +2,7 @@ import re
 from typing import Dict, List
 
 from config import LIMIT_DOMAINS
-from projectexception import DomainsLimitExceeded
+from exceptions import DomainsLimitExceeded
 
 
 PATTERN = re.compile(r"^[a-z\d]{1,1}[a-z\d-]{,61}[a-z\d]{1,1}\.{1,1}(ru|(xn--p1ai))$")

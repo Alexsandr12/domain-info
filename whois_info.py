@@ -2,7 +2,7 @@ import socket
 from typing import Dict
 
 from config import WHOIS_TIMEOUT, PORT, WHOIS_SERVER
-from projectexception import GettingWhoisTextError, DomainsNotRegistred
+from exceptions import GettingWhoisTextError, DomainsNotRegistred
 
 
 def search_whois_text(dname: str) -> str:

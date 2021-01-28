@@ -6,7 +6,7 @@ import dns.query
 import dns.flags
 import dns.resolver
 
-from projectexception import GettingDnsInfoError
+from exceptions import GettingDnsInfoError
 from config import TYPE_RECORDS, PAYLOAD, DNS_TIMEOUT, IP_ROOT_DNS
 
 """domain = 'reg.ru'
