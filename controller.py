@@ -37,18 +37,18 @@ from logger import (
 )
 
 # TODO генератор списков
-# TODO переделать прежнее приложение
-# TODO 223 строка, отменен dname
+# TODO доделать staticmethod
 
 
 class ControllerGet:
-    """Методы для get запросов"""
+    """Методы для get запросов."""
 
-    def check_connect_db(self) -> Dict[str, str]:
-        """Получение и формирование инфы о статусе подключения к базам данных
+    @staticmethod
+    def check_connect_db() -> Dict[str, str]:
+        """Получение и формирование инфы о статусе подключения к базам данных.
 
         Return:
-            dict: словарь со статусом соединения и ошибкой, если она имеется
+            dict: словарь со статусом соединения и ошибкой, если она имеется.
         """
         service_status = {"status": "successful"}
 
@@ -69,11 +69,12 @@ class ControllerGet:
 
         return service_status
 
-    def get_all_cached_domains(self) -> Union[str, List[str]]:
-        """Получение всех закэшированных доменов из redis
+    @staticmethod
+    def get_all_cached_domains() -> Union[str, List[str]]:
+        """Получение всех закэшированных доменов из redis.
 
         Return:
-            Union[str, List[str]]: сообщение о ошибке соединения с базой данных или список с доменами
+            Union[str, List[str]]: сообщение о ошибке соединения с базой данных или список с доменами.
         """
         all_cached_domains = []
         try:
@@ -88,7 +89,8 @@ class ControllerGet:
 
         return list(set(all_cached_domains))
 
-    def get_info_from_sql(self) -> Union[str, Dict[str, list]]:
+    @staticmethod
+    def get_info_from_sql() -> Union[str, Dict[str, list]]:
         """Получение всей информации из sql
 
         Return:
