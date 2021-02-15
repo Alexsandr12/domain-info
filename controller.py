@@ -37,7 +37,6 @@ from logger import (
 )
 
 # TODO генератор списков
-# TODO доделать staticmethod
 
 
 class ControllerGet:

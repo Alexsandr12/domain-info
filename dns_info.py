@@ -28,7 +28,7 @@ def search_dns_records(dname: str) -> Dict[str, list]:
         values_record = parsing_values_record(response)
         records_of_dname[type_record] = values_record
 
-    if records_of_dname["NS"]:
+    if not records_of_dname["NS"]:
         raise GettingDnsInfoError
 
     return records_of_dname
@@ -82,9 +82,9 @@ def parsing_values_record(response: dns.message.QueryMessage) -> List[str]:
     """
     valid_values_record = []
     if response.answer:
-        not_valid_values_record = response.answer[0]
-        for not_valid_value in not_valid_values_record:
-            valid_value = str(not_valid_value).strip('"')
+        values_record = response.answer[0]
+        for value in values_record:
+            valid_value = str(value).strip('"')
             valid_values_record.append(valid_value)
 
     return valid_values_record
