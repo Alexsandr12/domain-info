@@ -36,8 +36,6 @@ from logger import (
     logger_get_whois_text,
 )
 
-# TODO генератор списков
-
 
 class ControllerGet:
     """Методы для get запросов."""
