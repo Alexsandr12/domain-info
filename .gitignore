@@ -9,4 +9,4 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-/mypy_cache/
+.mypy_cache/
