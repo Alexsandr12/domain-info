@@ -294,7 +294,8 @@ class ControllerPost:
 
         return http_info
 
-    def _rec_http_info_sql(self, dname: str, http_info: str):
+    @staticmethod
+    def _rec_http_info_sql(dname: str, http_info: str):
         """Запись данных в sql
 
         Args:
