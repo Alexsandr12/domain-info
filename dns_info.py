@@ -46,8 +46,9 @@ def get_ip_of_dns(dname: str) -> str:
     dns_of_dname = get_dns_of_dname(dname)
 
     rrset_ip_of_dns = dns.resolver.resolve(dns_of_dname)
-    for ip_adresses_of_dns in rrset_ip_of_dns.response.answer:
-        return str(ip_adresses_of_dns[0])
+    ip_addresses_of_dns = rrset_ip_of_dns.response.answer[0]
+
+    return str(ip_addresses_of_dns[0])
 
 
 def get_dns_of_dname(dname: str) -> str:

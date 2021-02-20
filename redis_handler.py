@@ -16,14 +16,14 @@ def check_connect_redis() -> None:
 
 
 def check_cache_redis(dname: str, method: str) -> Union[str, None]:
-    """Запрос данных по методу для домена
+    """Поиск данных в кэш
 
     Args:
         dname: домен
         method: название метода
 
     Return:
-        Union[str, None]: данные по методу или None.
+        Union[str, None]: результаты поиска
     """
     if cache := redis_conn.get(f"{method}:{dname}"):
         return cache.decode("utf-8", "replace")
@@ -49,7 +49,7 @@ def check_dns_info(dname: str, method: str) -> Union[dict, None]:
         method: название метода
 
     Return:
-        Union[dict, None]: словать с типами записей и их значениями / None
+        Union[dict, None]: словать с типами ns записей и их значениями / None
     """
     if dns_info := redis_conn.hgetall(f"{method}:{dname}"):
         dns_info_decode = {}
@@ -67,7 +67,7 @@ def rec_dns_info(dname: str, method: str, dns_info: dict):
     Args:
         dname: домен
         method: название метода
-        dns_info: ресурсные записи и их значения
+        dns_info: ns записи и их значения
     """
     for type_record, val_record in dns_info.items():
         redis_conn.hset(f"{method}:{dname}", type_record, str(val_record))

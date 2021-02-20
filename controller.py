@@ -14,7 +14,7 @@ from redis_handler import (
     get_all_key,
 )
 from sql_handler import rec_method_status_sql, check_connect_sql, get_all_data_sql
-from utilits import encoding_domains, decode_domain
+from utils import encoding_domains, decode_domain
 from exceptions import (
     GeneralError,
     DbError,
@@ -80,8 +80,8 @@ class ControllerGet:
             return err.TEXT_MESSAGE
 
         for key in all_key_redis:
-            key = key.split(":")
-            dname = decode_domain(key[1])
+            method, dname_puny = key.split(":")
+            dname = decode_domain(dname_puny)
             all_cached_domains.append(dname)
 
         return list(set(all_cached_domains))
@@ -110,7 +110,7 @@ class ControllerGet:
                     "data": f"{datetime.year}.{datetime.month}.{datetime.day}",
                     "time": f"{datetime.hour}:{datetime.minute}:{datetime.second}",
                     "method": sql_record[3],
-                    "status": sql_record[4] == 0,
+                    "status": sql_record[4] != 0,
                 }
             )
 
@@ -265,10 +265,10 @@ class ControllerPost:
         try:
             whois_info = parsing_whois_text(whois_text)
             rec_method_status_sql(dname, "get_whois_info", True)
+            return whois_info
         except DomainsNotRegistred as err:
-            whois_info = err.TEXT_MESSAGE
             rec_method_status_sql(dname, "get_whois_info", False)
-        return whois_info
+            return err.TEXT_MESSAGE
 
     def _get_http_info(self, dname: str) -> str:
         """Получение http инфо по домену
