@@ -24,7 +24,7 @@ PRIMARY KEY (id)
 """try:
     method_cursor.execute(create_table_data)
     method_conn.commit()
-    # print("Таблица создана")
+    print("Таблица создана")
 except Error as e:
     print(e)"""
 
@@ -45,8 +45,8 @@ def rec_method_status_sql(dname: str, method: str, success_value: bool):
         method: название метода
         success_value: статус выполнения метода
     """
-    query = f"""INSERT INTO used_methods 
-        ( domain, methods, success) 
+    query = """INSERT INTO used_methods
+        ( domain, methods, success)
         VALUES ( %s, %s, %s)"""
     method_cursor.execute(query, (dname, method, success_value))
     method_conn.commit()
@@ -58,7 +58,7 @@ def get_all_data_sql() -> List[tuple]:
     Return:
         List[tuple]: список со всеми строками таблицы
     """
-    query = f"SELECT * FROM used_methods"
+    query = "SELECT * FROM used_methods"
 
     try:
         method_cursor.execute(query)
