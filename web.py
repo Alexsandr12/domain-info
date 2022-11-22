@@ -4,6 +4,7 @@ from flask import Flask, request
 
 from controller import ControllerPost, ControllerGet
 from config import INDENT, ENSURE_ASCII
+from utils import get_request_data
 
 app = Flask(__name__)
 
@@ -15,8 +16,7 @@ def get_whois_text() -> str:
     Return:
         str: whois текст доменов
     """
-    domains = request.json["domain"]
-    use_cache = request.json["use_cache"]
+    domains, use_cache = get_request_data(request.get_json())
     whois_text_dnames = ControllerPost(
         domains, "get_whois_text", use_cache
     ).forming_response()
@@ -31,8 +31,7 @@ def get_whois_info() -> str:
     Return:
         str: whois info доменов
     """
-    domains = request.json["domain"]
-    use_cache = request.json["use_cache"]
+    domains, use_cache = get_request_data(request.get_json())
     whois_info_dnames = ControllerPost(
         domains, "get_whois_info", use_cache
     ).forming_response()
@@ -47,8 +46,7 @@ def get_http_info() -> str:
     Return:
         str: http info доменов
     """
-    domains = request.json["domain"]
-    use_cache = request.json["use_cache"]
+    domains, use_cache = get_request_data(request.get_json())
     http_info_domains = ControllerPost(
         domains, "get_http_info", use_cache
     ).forming_response()
@@ -63,8 +61,7 @@ def get_dns_info() -> str:
     Return:
         str: dns info доменов
     """
-    domains = request.json["domain"]
-    use_cache = request.json["use_cache"]
+    domains, use_cache = get_request_data(request.get_json())
     dns_info_domains = ControllerPost(
         domains, "get_dns_info", use_cache
     ).forming_response()
@@ -79,8 +76,7 @@ def get_all_info() -> str:
     Return:
         str: вся собранная информация о доменах из post методов
     """
-    domains = request.json["domain"]
-    use_cache = request.json["use_cache"]
+    domains, use_cache = get_request_data(request.get_json())
     all_info_domains = ControllerPost(
         domains, "get_all_info", use_cache
     ).forming_response()

@@ -27,3 +27,14 @@ def decode_domain(dname: str) -> str:
     """
     dname = idna.decode(dname)
     return dname
+
+
+def get_request_data(request_dict: dict) -> tuple:
+    """Формирует параметры для post-запросов.
+
+    Args:
+        request_dict: данные переданные в post-запрос
+    Return:
+        tuple: параметры для post-запросов
+    """
+    return request_dict["domain"], request_dict.get("use_cache", "True")
