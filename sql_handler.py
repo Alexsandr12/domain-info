@@ -1,68 +1,56 @@
-import mysql.connector
-from mysql.connector import Error
+import psycopg2
 from typing import List
 
 from exceptions import MySqlError
-from config import HOST, USER, PASSWORD, DATABASE
-
-method_conn = mysql.connector.connect(
-    host=HOST, user=USER, password=PASSWORD, database=DATABASE
-)
-
-method_cursor = method_conn.cursor()
-create_table_data = """
-CREATE TABLE IF NOT EXISTS used_methods (
-id INT AUTO_INCREMENT,
-domain TEXT NOT NULL,
-datetime TIMESTAMP NOT NULL,
-methods TEXT NOT NULL,
-success BOOL NOT NULL,
-PRIMARY KEY (id)
-)
-"""
-
-"""try:
-    method_cursor.execute(create_table_data)
-    method_conn.commit()
-    print("Таблица создана")
-except Error as e:
-    print(e)"""
+from config import DSN
 
 
-def check_connect_sql() -> None:
-    """Проверка подключения к mariadb"""
-    try:
-        method_conn.ping()
-    except mysql.connector.errors.InterfaceError:
-        raise MySqlError
+class SqlHandler:
+    def __init__(self):
+        self.conn = psycopg2.connect(DSN)
+
+    def __del__(self):
+        self.conn.close()
+
+    def check_connect_sql(self) -> None:
+        """Проверка подключения к postgresql"""
+        try:
+            cursor = self.conn.cursor()
+            cursor.execute("SELECT 1")
+        except (psycopg2.InterfaceError, psycopg2.OperationalError):
+            raise MySqlError
+
+    def rec_method_status_sql(self, dname: str, method: str, success_value: bool):
+        """Запись информцаии о статусе выполнения метода
+
+        Args:
+            dname: домен
+            method: название метода
+            success_value: статус выполнения метода
+        """
+        query = """INSERT INTO used_methods
+            ( domain, methods, success)
+            VALUES ( %s, %s, %s)"""
+
+        cursor = self.conn.cursor()
+        cursor.execute(query, (dname, method, success_value))
+        self.conn.commit()
+
+    def get_all_data_sql(self) -> List[tuple]:
+        """Получение всех данных из sql
+
+        Return:
+            List[tuple]: список со всеми строками таблицы
+        """
+        query = "SELECT * FROM used_methods"
+        cursor = self.conn.cursor()
+
+        try:
+            cursor.execute(query)
+        except (psycopg2.InterfaceError, psycopg2.OperationalError):
+            raise MySqlError
+
+        return cursor.fetchall()
 
 
-def rec_method_status_sql(dname: str, method: str, success_value: bool):
-    """Запись информцаии о статусе выполнения метода
-
-    Args:
-        dname: домен
-        method: название метода
-        success_value: статус выполнения метода
-    """
-    query = """INSERT INTO used_methods
-        ( domain, methods, success)
-        VALUES ( %s, %s, %s)"""
-    method_cursor.execute(query, (dname, method, success_value))
-    method_conn.commit()
-
-
-def get_all_data_sql() -> List[tuple]:
-    """Получение всех данных из sql
-
-    Return:
-        List[tuple]: список со всеми строками таблицы
-    """
-    query = "SELECT * FROM used_methods"
-
-    try:
-        method_cursor.execute(query)
-    except mysql.connector.errors.DatabaseError:
-        raise MySqlError
-
-    return method_cursor.fetchall()
+sql = SqlHandler()
