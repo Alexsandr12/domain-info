@@ -13,7 +13,7 @@ from redis_handler import (
     check_connect_redis,
     get_all_key,
 )
-from sql_handler import rec_method_status_sql, check_connect_sql, get_all_data_sql
+from sql_handler import sql
 from utils import encoding_domains, decode_domain
 from exceptions import (
     GeneralError,
@@ -56,7 +56,7 @@ class ControllerGet:
             service_status["error"] = err.TEXT_MESSAGE
 
         try:
-            check_connect_sql()
+            sql.check_connect_sql()
         except MySqlError as err:
             service_status["status"] = "error"
             if service_status.get("error"):
@@ -96,7 +96,7 @@ class ControllerGet:
         """
         info_from_sql = defaultdict(list)
         try:
-            sql_all_data = get_all_data_sql()
+            sql_all_data = sql.get_all_data_sql()
         except MySqlError as err:
             return err.TEXT_MESSAGE
 
@@ -145,6 +145,7 @@ class ControllerPost:
             "get_dns_info": logger_get_dns_info,
             "get_all_info": logger_get_all_info,
         }
+        self.logger_client = logger_client
 
     def forming_response(self) -> Union[str, dict]:
         """Основной модуль, проверка подключения к бд, валидацию доменов,
@@ -155,10 +156,10 @@ class ControllerPost:
             словарь с валидными доменами и ответом методов, и невалидными доменами
         """
         try:
-            check_connect_sql()
+            sql.check_connect_sql()
             check_connect_redis()
         except GeneralError as err:
-            logger_client.exception(
+            self.logger_client.exception(
                 f"Запрос клиента: метод: {self.method}, домены: {self.domains}, use_cache: {self.use_cache}. "
                 f"Ответ: {err.TEXT_MESSAGE}"
             )
@@ -167,7 +168,7 @@ class ControllerPost:
         try:
             domains = self._validation_domains()
         except DomainsLimitExceeded as err:
-            logger_client.exception(
+            self.logger_client.exception(
                 f"Запрос клиента: метод: {self.method}, домены: {self.domains}, use_cache: {self.use_cache}. "
                 f"Ответ: {err.TEXT_MESSAGE}"
             )
@@ -176,7 +177,7 @@ class ControllerPost:
         response = self._collecting_response_from_method(domains["domains_valid"])
         if domains["domains_not_valid"]:
             response["Invalid domain names"] = domains["domains_not_valid"]
-        logger_client.debug(
+        self.logger_client.debug(
             f"Запрос клиента: метод: {self.method}, домены: {self.domains}, use_cache: {self.use_cache}. "
             f"Ответ: {response}"
         )
@@ -243,10 +244,10 @@ class ControllerPost:
             try:
                 whois_text = search_whois_text(dname)
             except GettingWhoisTextError as err:
-                rec_method_status_sql(dname, "get_whois_text", False)
+                sql.rec_method_status_sql(dname, "get_whois_text", False)
                 return err.TEXT_MESSAGE
             rec_redis(dname, "get_whois_text", whois_text)
-            rec_method_status_sql(dname, "get_whois_text", True)
+            sql.rec_method_status_sql(dname, "get_whois_text", True)
 
         return whois_text
 
@@ -264,10 +265,10 @@ class ControllerPost:
             return whois_text
         try:
             whois_info = parsing_whois_text(whois_text)
-            rec_method_status_sql(dname, "get_whois_info", True)
+            sql.rec_method_status_sql(dname, "get_whois_info", True)
             return whois_info
         except DomainsNotRegistred as err:
-            rec_method_status_sql(dname, "get_whois_info", False)
+            sql.rec_method_status_sql(dname, "get_whois_info", False)
             return err.TEXT_MESSAGE
 
     def _get_http_info(self, dname: str) -> str:
@@ -303,9 +304,9 @@ class ControllerPost:
             http_info: http информация по домену
         """
         if GettingHttpInfoError.TEXT_MESSAGE == http_info:
-            rec_method_status_sql(dname, "get_http_info", False)
+            sql.rec_method_status_sql(dname, "get_http_info", False)
         else:
-            rec_method_status_sql(dname, "get_http_info", True)
+            sql.rec_method_status_sql(dname, "get_http_info", True)
 
     def _get_dns_info(self, dname: str) -> Union[str, dict]:
         """Получение dns info для домена
@@ -324,9 +325,9 @@ class ControllerPost:
             try:
                 dns_info = search_dns_records(dname)
             except GettingDnsInfoError as err:
-                rec_method_status_sql(dname, "get_dns_info", False)
+                sql.rec_method_status_sql(dname, "get_dns_info", False)
                 return err.TEXT_MESSAGE
-        rec_method_status_sql(dname, "get_dns_info", True)
+        sql.rec_method_status_sql(dname, "get_dns_info", True)
         rec_dns_info(dname, "get_dns_info", dns_info)
         return dns_info
 
