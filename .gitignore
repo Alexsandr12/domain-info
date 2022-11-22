@@ -23,9 +23,13 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 
+# venv
+venv/
+
 # mypy
 .mypy_cache/
 .dmypy.json
 dmypy.json
 
+.env
 test.py
