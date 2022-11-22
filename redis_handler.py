@@ -25,7 +25,8 @@ def check_cache_redis(dname: str, method: str) -> Union[str, None]:
     Return:
         Union[str, None]: результаты поиска
     """
-    if cache := redis_conn.get(f"{method}:{dname}"):
+    cache = redis_conn.get(f"{method}:{dname}")
+    if cache:
         return cache.decode("utf-8", "replace")
     return None
 
@@ -51,7 +52,8 @@ def check_dns_info(dname: str, method: str) -> Union[dict, None]:
     Return:
         Union[dict, None]: словать с типами ns записей и их значениями / None
     """
-    if dns_info := redis_conn.hgetall(f"{method}:{dname}"):
+    dns_info = redis_conn.hgetall(f"{method}:{dname}")
+    if dns_info:
         dns_info_decode = {}
         for type_record, val_record in dns_info.items():
             dns_info_decode[type_record.decode("utf-8", "replace")] = val_record.decode(
