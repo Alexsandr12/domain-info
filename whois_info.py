@@ -48,7 +48,7 @@ def parsing_whois_text(whois_text: str) -> Dict[str, str]:
     whois_strings = whois_text.split("\n")
     whois_info = {}
     number_server = 0
-    info_of_interest = whois_strings[5:-5]
+    info_of_interest = whois_strings[:-5]
 
     for string_of_whois in info_of_interest:
         point_whois, point_value = string_of_whois.split(":", maxsplit=1)
